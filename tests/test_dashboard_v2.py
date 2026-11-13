@@ -47,6 +47,8 @@ class DashboardV2Tests(unittest.TestCase):
             "ISU_CHEMICAL_V2_BUNDLE_ROOT": str(self.bundles),
             "ISU_CHEMICAL_HISTORY_DB": str(self.db),
             "ISU_CHEMICAL_DAE_BUNDLE": str(self.root / "missing_dae"),
+            "ISU_CHEMICAL_CANDIDATE_BUNDLE": "",
+            "ISU_CHEMICAL_CANDIDATE_LABELS": "0",
         })
         environment.start()
         self.addCleanup(environment.stop)

@@ -12,7 +12,8 @@ from vibration.dashboard_v2 import configuration, bundle_state, analyze, history
 from vibration.detail_ui import spectrum_frame, segment_frame
 from vibration.history import KST, history_csv
 from vibration.web_inference import preview_mat, upload_name, error_message, MODEL_LABELS
-from vibration.candidate_analysis import VERSION as CANDIDATE_VERSION, safe_candidate_analysis
+from vibration.candidate_analysis import STAGE_VERSION as CANDIDATE_VERSION, analyze_with_engine
+from vibration.candidate_engine import bundle_identity as candidate_bundle_identity
 from vibration.candidate_history import read_candidate
 from vibration.candidate_ui import render_candidate
 
@@ -190,7 +191,8 @@ def main():
             st.caption(state["message"])
             raw = upload.getvalue() if upload is not None else None
             identity = (hashlib.sha256(raw).hexdigest() if raw else None, rpm,
-                        upload_name(upload.name) if upload else None, config, state["stamp"], CANDIDATE_VERSION)
+                        upload_name(upload.name) if upload else None, config, state["stamp"], CANDIDATE_VERSION,
+                        candidate_bundle_identity())
             if st.session_state.get("v2_identity") != identity:
                 st.session_state.pop("v2_result", None)
                 st.session_state.pop("v2_versions", None)
@@ -219,7 +221,7 @@ def main():
                 try:
                     with st.spinner("진동 이상 징후를 분석하고 있습니다…"):
                         result, versions = analyze(raw, rpm, upload_name(upload.name), config)
-                        candidate, signal_details = safe_candidate_analysis(raw, rpm)
+                        candidate, signal_details = analyze_with_engine(raw, rpm, result)
                     st.session_state["v2_result"], st.session_state["v2_versions"] = result, versions
                     st.session_state['v2_candidate'], st.session_state['v2_signal_details'] = candidate, signal_details
                 except Exception as error:

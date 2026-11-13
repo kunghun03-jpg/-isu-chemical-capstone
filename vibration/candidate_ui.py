@@ -11,12 +11,27 @@ def render_candidate(report):
         st.info('이 기록에는 결함 후보 근거가 없습니다. 새 분석에서 확인할 수 있습니다.')
         return
     st.metric('결함 후보', report['candidate'])
-    st.caption('이상 탐지와 별도 결과입니다. 결함 종류를 뒷받침할 검증된 기준이 없어 확정하지 않습니다.')
+    st.caption('이상 탐지와 별도 결과입니다. 확정 진단이 아닌 탐색적 결함 후보이며 실제 점검이 필요합니다.')
+    for reason in report.get('reasons', []):
+        st.info(reason)
     if report['status'] == 'unavailable':
         st.warning(report['failure'])
         return
     features = report['features']
-    st.write('베어링 · 불평형 · 느슨함을 검토했으나, 정상 비교 기준과 검증된 분류 근거가 부족합니다.')
+    if report['status'] == 'candidate':
+        st.write('학습된 후보 엔진의 출력입니다. 아래 관측 특징이 결함의 물리적 원인을 확정하지는 않습니다.')
+    elif report['status'] != 'skipped_normal':
+        st.write('결함 종류 제시를 보류했습니다. 실제 관측값과 보류 사유를 함께 확인하세요.')
+    engine = report.get('engine')
+    if engine is not None:
+        with st.expander('후보 엔진 출력 · 보류 판단 근거'):
+            st.write('원시 분류 결과: ' + engine['raw_prediction'])
+            st.caption('원시 결과는 보류될 수 있습니다. 분류 점수와 점수 차이는 신뢰도나 보정된 확률이 아닙니다.')
+            st.dataframe(pd.DataFrame([{'클래스': k, '분류 점수 (미보정)': v} for k, v in engine['scores_uncalibrated'].items()]), hide_index=True)
+            st.write(f"1·2위 점수 차이: {engine['score_margin']:.6g}")
+            st.caption('엔진: ' + engine['kind'] + ' · ' + engine['model_version'])
+            if engine['policy_rule'] is not None:
+                st.write('Validation에서 선택한 제시 기준:', engine['policy_rule'])
     st.caption(f"실제 관측값 · 1X {features['one_x_amplitude']:.5g} · 2X {features['two_x_amplitude']:.5g} · "
                f"고주파 평균제곱 {features['energy_high']:.5g} (센서 raw 단위)")
     with st.expander('실제 진동 특징량 9개와 측정 조건'):

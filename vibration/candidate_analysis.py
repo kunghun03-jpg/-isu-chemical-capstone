@@ -6,8 +6,11 @@ import numpy as np
 # Reuse the existing EDA math, not classifiers or harmonic improvement experiments.
 from scripts.analyze_fault_signatures import analyze_signal
 from vibration.web_inference import preview_mat
+from vibration.candidate_engine import CandidateEngine, LABELS, bundle_identity
 
 VERSION = 'ch3_candidate_evidence_v1'
+STAGE_VERSION = 'ch3_candidate_engine_v2'
+SKIPPED = 'AE 정상 · 후보 추정 생략'
 UNCLEAR = '결함 후보 불명확'
 FEATURE_LABELS = {
     'rms_ac': ('AC RMS', 'raw units'), 'peak_ac': ('AC Peak', 'raw units'),
@@ -74,3 +77,37 @@ def safe_candidate_analysis(raw, rpm):
         report = base_report(raw, rpm)
         report.update(status='unavailable', failure='진동 특징 계산을 완료하지 못했습니다. AE 결과와 별도로 입력·수치 상태를 확인하세요.')
         return report, None
+
+
+def analyze_with_engine(raw, rpm, ae_result):
+    """Extract observations for display; execute RF only when this same input is AE-abnormal."""
+    report, spectrum = safe_candidate_analysis(raw, rpm)
+    report.update(schema_version=2, analyzer_version=STAGE_VERSION, abstained=True, reasons=[], engine=None)
+    report['limitations'][0] = '결함 후보 엔진의 적용 여부와 보류 사유를 확인하세요. 후보는 확정 진단이 아니며 진단 성능은 별도 검증이 필요합니다.'
+    if (report['input_sha256'] != ae_result['input']['sha256'] or rpm != ae_result['input']['rpm'] or
+            set(ae_result['models']) != {'autoencoder'}):
+        raise ValueError('AE와 후보 분석 입력이 일치하지 않습니다.')
+    item = ae_result['models']['autoencoder']
+    abnormal = bool(item['predicted_anomaly'])
+    if abnormal != (item['file_score'] > item['file_threshold']):
+        raise ValueError('AE 판정 규칙이 일치하지 않습니다.')
+    if not abnormal:
+        report['reasons'] = ['AE 정상으로 결함 후보 엔진 실행을 생략했습니다. 결함 부재를 보장하지 않습니다.']
+        if report['status'] != 'unavailable':
+            report.update(candidate=SKIPPED, status='skipped_normal', abstained=False)
+        return report, spectrum
+    if report['status'] == 'unavailable':
+        report['reasons'] = [report['failure']]
+        return report, spectrum
+    folder, enabled, _ = bundle_identity()
+    if folder is None:
+        report.update(status='abstained', reasons=['후보 모델 미설정: ISU_CHEMICAL_CANDIDATE_BUNDLE 경로를 확인하세요.'])
+        return report, spectrum
+    try:
+        engine = CandidateEngine(folder).predict(report['features'], rpm, labels_enabled=enabled)
+        report.update(engine=engine, reasons=engine['reasons'], status='candidate' if engine['accepted'] else 'abstained',
+                      abstained=not engine['accepted'], candidate=LABELS[engine['raw_prediction']] if engine['accepted'] else UNCLEAR)
+        report['limitations'][0] = 'Random Forest 분류 점수는 보정된 확률·신뢰도가 아닙니다. 후보는 확정 진단이 아닙니다.'
+    except Exception as error:
+        report.update(status='abstained', reasons=[f'후보 모델 로드·입력·추론 오류: {type(error).__name__}: {error}'])
+    return report, spectrum
