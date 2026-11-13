@@ -49,7 +49,7 @@ class HistoryStore:
             CREATE INDEX IF NOT EXISTS history_date_rpm ON analyses(analyzed_date, rpm);
         """)
 
-    def save(self, result, model_versions):
+    def save(self, result, model_versions, *, candidate_report=None):
         timestamp = datetime.fromisoformat(result["analyzed_at_utc"])
         if timestamp.tzinfo is None:
             raise ValueError("분석 시각에 시간대가 필요합니다.")
@@ -70,6 +70,10 @@ class HistoryStore:
             models.append((name, version, score, threshold, predicted))
         if not models:
             raise ValueError("저장할 모델 결과가 없습니다.")
+        candidate_payload = None
+        if candidate_report is not None:
+            from vibration.candidate_history import encode_candidate
+            candidate_payload = encode_candidate(candidate_report, result)
         item = result["input"]
         parent = (
             timestamp.astimezone(timezone.utc).isoformat(),
@@ -104,6 +108,9 @@ class HistoryStore:
                     "INSERT INTO model_results VALUES (?, ?, ?, ?, ?, ?)",
                     [(analysis_id, *row) for row in models],
                 )
+            if candidate_payload is not None:
+                from vibration.candidate_history import insert_candidate
+                insert_candidate(connection, analysis_id, candidate_payload)
         return analysis_id, created
 
     def search(self, start=None, end=None, rpm=None, model=None, decision=None):
