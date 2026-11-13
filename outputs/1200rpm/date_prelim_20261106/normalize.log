@@ -1,0 +1,9 @@
+
+=== 1200RPM / normalize ===
+train: (816, 1, 3201), 유한값 확인 완료
+validation: (752, 1, 3201), 유한값 확인 완료
+test_normal: (792, 1, 3201), 유한값 확인 완료
+test_anomaly: (3144, 1, 3201), 유한값 확인 완료
+정규화 완료!
+
+완료: C:\Users\82106\OneDrive\바탕 화면\isu_chemical\outputs\1200rpm\date_prelim_20261106

@@ -1,0 +1,41 @@
+[
+  {
+    "rpm": 1200,
+    "model": "autoencoder",
+    "score_direction": "MSE; higher=anomaly",
+    "aggregation": "arithmetic_mean_of_8_segment_scores",
+    "file_threshold": 0.18491544675774046,
+    "validation_file_q95": 0.18491544675774046,
+    "segment_threshold": 0.19104118121358435,
+    "validation_segment_q95": 0.19104118121358435,
+    "max_saved_segment_score_difference": 0.0,
+    "max_saved_file_score_difference": 0.0,
+    "status": "passed"
+  },
+  {
+    "rpm": 1200,
+    "model": "ocsvm",
+    "score_direction": "-score_samples; higher=anomaly",
+    "aggregation": "arithmetic_mean_of_8_segment_scores",
+    "file_threshold": -1.2956596908774491,
+    "validation_file_q95": -1.2956596908774491,
+    "segment_threshold": -1.1851959656820135,
+    "validation_segment_q95": -1.1851959656820135,
+    "max_saved_segment_score_difference": 0.0,
+    "max_saved_file_score_difference": 0.0,
+    "status": "passed"
+  },
+  {
+    "rpm": 1200,
+    "model": "iforest",
+    "score_direction": "-score_samples; higher=anomaly",
+    "aggregation": "arithmetic_mean_of_8_segment_scores",
+    "file_threshold": 0.4557029190430439,
+    "validation_file_q95": 0.4557029190430439,
+    "segment_threshold": 0.458824617387368,
+    "validation_segment_q95": 0.458824617387368,
+    "max_saved_segment_score_difference": 0.0,
+    "max_saved_file_score_difference": 0.0,
+    "status": "passed"
+  }
+]

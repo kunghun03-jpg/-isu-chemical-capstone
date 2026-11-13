@@ -1,0 +1,82 @@
+[
+  {
+    "stage": "inventory",
+    "rpm": 900,
+    "dates": null,
+    "split_mode": "run",
+    "normalization_requested": "per_frequency",
+    "run_manifest": null,
+    "python": "3.14.7 | packaged by Anaconda, Inc. | (main, Aug 14 2026, 10:12:46) [MSC v.1942 64 bit (AMD64)]",
+    "completed_utc": "2026-11-11T08:22:21.098387+00:00"
+  },
+  {
+    "stage": "check",
+    "rpm": 900,
+    "dates": null,
+    "split_mode": "run",
+    "normalization_requested": "per_frequency",
+    "run_manifest": null,
+    "python": "3.14.7 | packaged by Anaconda, Inc. | (main, Aug 14 2026, 10:12:46) [MSC v.1942 64 bit (AMD64)]",
+    "completed_utc": "2026-11-11T08:32:15.955355+00:00"
+  },
+  {
+    "stage": "split",
+    "rpm": 900,
+    "dates": null,
+    "split_mode": "date_preliminary",
+    "normalization_requested": "per_frequency",
+    "run_manifest": null,
+    "python": "3.14.7 | packaged by Anaconda, Inc. | (main, Aug 14 2026, 10:12:46) [MSC v.1942 64 bit (AMD64)]",
+    "completed_utc": "2026-11-11T08:42:42.110355+00:00"
+  },
+  {
+    "stage": "spectra",
+    "rpm": 900,
+    "dates": null,
+    "split_mode": "run",
+    "normalization_requested": "per_frequency",
+    "run_manifest": null,
+    "python": "3.14.7 | packaged by Anaconda, Inc. | (main, Aug 14 2026, 10:12:46) [MSC v.1942 64 bit (AMD64)]",
+    "completed_utc": "2026-11-11T08:43:33.712915+00:00"
+  },
+  {
+    "stage": "normalize",
+    "rpm": 900,
+    "dates": null,
+    "split_mode": "run",
+    "normalization_requested": "per_frequency",
+    "run_manifest": null,
+    "python": "3.14.7 | packaged by Anaconda, Inc. | (main, Aug 14 2026, 10:12:46) [MSC v.1942 64 bit (AMD64)]",
+    "completed_utc": "2026-11-11T08:44:56.013932+00:00"
+  },
+  {
+    "stage": "train",
+    "rpm": 900,
+    "dates": null,
+    "split_mode": "run",
+    "normalization_requested": "per_frequency",
+    "run_manifest": null,
+    "python": "3.14.4 (main, Aug 20 2026, 10:41:58) [GCC 15.2.0]",
+    "completed_utc": "2026-11-11T09:03:26.986264+00:00"
+  },
+  {
+    "stage": "evaluate",
+    "rpm": 900,
+    "dates": null,
+    "split_mode": "run",
+    "normalization_requested": "per_frequency",
+    "run_manifest": null,
+    "python": "3.14.4 (main, Aug 20 2026, 10:41:58) [GCC 15.2.0]",
+    "completed_utc": "2026-11-11T09:04:43.434310+00:00"
+  },
+  {
+    "stage": "file_evaluate",
+    "rpm": 900,
+    "dates": null,
+    "split_mode": "run",
+    "normalization_requested": "per_frequency",
+    "run_manifest": null,
+    "python": "3.14.4 (main, Aug 20 2026, 10:41:58) [GCC 15.2.0]",
+    "completed_utc": "2026-11-11T09:06:42.798270+00:00"
+  }
+]

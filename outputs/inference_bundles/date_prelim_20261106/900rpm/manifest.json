@@ -1,0 +1,151 @@
+{
+  "schema_version": 1,
+  "rpm": 900,
+  "source_experiment": "date_prelim_20261106",
+  "data_fingerprint": "122d4d8b75c89d31a3fd29b53a83760ef06f6c5896068158a0af75b3c4c73dd3",
+  "experiment_mode": "date_preliminary",
+  "run_independence_verified": false,
+  "preprocessing": {
+    "version": "ch3_fft_log1p_v1",
+    "raw_shape": [
+      6,
+      65536
+    ],
+    "fs": 25600.0,
+    "channel_number": 3,
+    "channel_index": 2,
+    "segments": 8,
+    "window_size": 8192,
+    "remove_mean": "per_segment",
+    "window": "numpy.hanning_symmetric",
+    "fft": "numpy.rfft",
+    "amplitude_scale": "abs_fft_divide_window_sum_double_interior_bins",
+    "frequency_range_hz": [
+      0,
+      10000
+    ],
+    "upper_frequency_inclusive": true,
+    "frequency_bins": 3201,
+    "transform": "numpy.log1p",
+    "pre_z_dtype": "float32",
+    "quality_scope": "all_6_raw_channels",
+    "extreme_value_limit": 1e+100
+  },
+  "preprocessing_provenance": "legacy batch formula, explicitly recorded and verified against archived pre-Z/normalized data",
+  "normalization": {
+    "artifact": "normalization.npz",
+    "mode": "per_frequency",
+    "reference_split": "train",
+    "shape": [
+      1,
+      1,
+      3201
+    ]
+  },
+  "file_aggregation": "arithmetic_mean_of_8_segment_scores",
+  "decision_rule": "score > threshold",
+  "models": {
+    "autoencoder": {
+      "artifact": "autoencoder.pt",
+      "score_method": "double_precision_reconstruction_MSE",
+      "segment_threshold": 0.33143739054219284,
+      "file_threshold": 0.3242139731159553,
+      "epoch": 30
+    },
+    "ocsvm": {
+      "artifact": "ocsvm.joblib",
+      "score_method": "negative_score_samples",
+      "segment_threshold": -0.3040815614748258,
+      "file_threshold": -0.374341455957232
+    },
+    "iforest": {
+      "artifact": "iforest.joblib",
+      "score_method": "negative_score_samples",
+      "segment_threshold": 0.48041123685402864,
+      "file_threshold": 0.4764751544686325
+    }
+  },
+  "artifacts": {
+    "normalization.npz": "8d46353987edffaf45499cc9e78135d736f8c99bc2741ec74f2a7adbc4f22b7d",
+    "autoencoder.pt": "c3e08ed1ef3187cd623d20e13bf5c3b665ad01eb9dee5e3e8b77b5bfd7b3da44",
+    "ocsvm.joblib": "1249fb33dcfc9b9c6a507b60608e322d0ec0bddfe1980bba1e84d361fa155f40",
+    "iforest.joblib": "8cc8da667db9b4e193468828702390df7c35da16f3a141b2c8b42e6bfc98a00c"
+  },
+  "versions": {
+    "numpy": "2.4.6",
+    "torch": "2.14.1+cpu",
+    "scikit_learn": "1.9.0"
+  },
+  "reference_file_metrics": {
+    "autoencoder": {
+      "normal_count": 100,
+      "anomaly_count": 398,
+      "false_positive_rate": 0.51,
+      "specificity": 0.49,
+      "detection_rate": 0.7512562814070352,
+      "auroc": 0.8270100502512563,
+      "auprc_average_precision": 0.958952916353885,
+      "condition_alarm_rates": {
+        "IR": 1.0,
+        "Looseness0.05": 1.0,
+        "Looseness0.1": 1.0,
+        "LoosenessFull": 1.0,
+        "Normal1": 0.0,
+        "Normal2": 1.0,
+        "OR": 1.0,
+        "Roller": 1.0,
+        "Unbalance_-1": 0.0,
+        "Unbalance_-2": 0.02
+      }
+    },
+    "ocsvm": {
+      "normal_count": 100,
+      "anomaly_count": 398,
+      "false_positive_rate": 1.0,
+      "specificity": 0.0,
+      "detection_rate": 0.9874371859296482,
+      "auroc": 0.7846984924623116,
+      "auprc_average_precision": 0.9506774300133073,
+      "condition_alarm_rates": {
+        "IR": 1.0,
+        "Looseness0.05": 1.0,
+        "Looseness0.1": 1.0,
+        "LoosenessFull": 1.0,
+        "Normal1": 1.0,
+        "Normal2": 1.0,
+        "OR": 1.0,
+        "Roller": 1.0,
+        "Unbalance_-1": 1.0,
+        "Unbalance_-2": 0.9
+      }
+    },
+    "iforest": {
+      "normal_count": 100,
+      "anomaly_count": 398,
+      "false_positive_rate": 0.71,
+      "specificity": 0.29000000000000004,
+      "detection_rate": 0.7738693467336684,
+      "auroc": 0.756281407035176,
+      "auprc_average_precision": 0.9424552380045921,
+      "condition_alarm_rates": {
+        "IR": 1.0,
+        "Looseness0.05": 1.0,
+        "Looseness0.1": 1.0,
+        "LoosenessFull": 1.0,
+        "Normal1": 0.40816326530612246,
+        "Normal2": 1.0,
+        "OR": 1.0,
+        "Roller": 1.0,
+        "Unbalance_-1": 0.14,
+        "Unbalance_-2": 0.06
+      }
+    }
+  },
+  "limitations": [
+    "Date-group preliminary models; actual independent Run boundaries unverified.",
+    "High normal false-positive rates on Sep 19; not production-validated.",
+    "RPM is caller-supplied nominal metadata, not measured speed.",
+    "No DAE, fault-cause estimation, warning tier, SQLite or web UI in this inference function."
+  ],
+  "bundle_id": "42dbd5f89a86315e20f316fc6fb4c4588a6262c6963d2173aad2bc4d22cb33f3"
+}

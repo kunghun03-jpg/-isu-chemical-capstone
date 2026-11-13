@@ -1,0 +1,50 @@
+[
+  {
+    "rpm": 900,
+    "stage": "spectra",
+    "wall_seconds": 13.246433000000252,
+    "exit_code": 0
+  },
+  {
+    "rpm": 900,
+    "stage": "normalize",
+    "wall_seconds": 5.346233599997504,
+    "exit_code": 0
+  },
+  {
+    "rpm": 900,
+    "stage": "train",
+    "wall_seconds": 27.09199389999776,
+    "exit_code": 0
+  },
+  {
+    "rpm": 900,
+    "stage": "evaluate",
+    "wall_seconds": 5.495313799998257,
+    "exit_code": 0
+  },
+  {
+    "rpm": 900,
+    "stage": "file_evaluate",
+    "wall_seconds": 5.167792299998837,
+    "exit_code": 0
+  },
+  {
+    "rpm": 900,
+    "stage": "ocsvm",
+    "wall_seconds": 7.449917199999618,
+    "exit_code": 0
+  },
+  {
+    "rpm": 900,
+    "stage": "iforest",
+    "wall_seconds": 5.465086000000156,
+    "exit_code": 0
+  },
+  {
+    "rpm": 900,
+    "stage": "compare",
+    "wall_seconds": 4.727081900000485,
+    "exit_code": 0
+  }
+]

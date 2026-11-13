@@ -1,0 +1,2 @@
+﻿low_hz,high_hz,upper_inclusive,bins,normal1_score_contribution,normal2_score_contribution,score_gap_contribution,percent_of_total_gap
+2200,2600,False,128,0.0067864080271605705,0.05919729322519673,0.052410885198036154,25.863770228943174

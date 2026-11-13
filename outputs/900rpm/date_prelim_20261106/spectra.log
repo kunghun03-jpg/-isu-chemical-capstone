@@ -1,0 +1,11 @@
+
+=== 900RPM / spectra ===
+train: (800, 1, 3201), 사용 파일 100개
+validation: (864, 1, 3201), 사용 파일 108개
+test_normal: (800, 1, 3201), 사용 파일 100개
+test_anomaly: (3184, 1, 3201), 사용 파일 398개
+
+900RPM 스펙트럼 저장 완료!
+저장 위치: C:\Users\82106\OneDrive\바탕 화면\isu_chemical\outputs\900rpm\date_prelim_20261106
+
+완료: C:\Users\82106\OneDrive\바탕 화면\isu_chemical\outputs\900rpm\date_prelim_20261106

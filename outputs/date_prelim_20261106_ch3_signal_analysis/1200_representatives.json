@@ -1,0 +1,32 @@
+{
+  "20260912_Normal1": {
+    "file": "data/20260912/20260912_1200RPM/Normal1/Vib/20260912_125345_Vib.mat",
+    "rms": 0.18655807690997991,
+    "selection": "closest to group median raw RMS; visualization only"
+  },
+  "20260916_Normal1": {
+    "file": "data/20260916/20260916_1200RPM/Normal1/Vib/20260916_110122_Vib.mat",
+    "rms": 0.10967597527570432,
+    "selection": "closest to group median raw RMS; visualization only"
+  },
+  "20260919_Normal1": {
+    "file": "data/20260919/20260919_1200RPM/Normal1/Vib/20260919_131418_Vib.mat",
+    "rms": 0.20965429373489036,
+    "selection": "closest to group median raw RMS; visualization only"
+  },
+  "20260912_Normal2": {
+    "file": "data/20260912/20260912_1200RPM/Normal2/Vib/20260912_164733_Vib.mat",
+    "rms": 0.12534891994319636,
+    "selection": "closest to group median raw RMS; visualization only"
+  },
+  "20260916_Normal2": {
+    "file": "data/20260916/20260916_1200RPM/Normal2/Vib/20260916_192329_Vib.mat",
+    "rms": 0.1446401303362317,
+    "selection": "closest to group median raw RMS; visualization only"
+  },
+  "20260919_Normal2": {
+    "file": "data/20260919/20260919_1200RPM/Normal2/Vib/20260919_145810_Vib.mat",
+    "rms": 0.25402591277903286,
+    "selection": "closest to group median raw RMS; visualization only"
+  }
+}

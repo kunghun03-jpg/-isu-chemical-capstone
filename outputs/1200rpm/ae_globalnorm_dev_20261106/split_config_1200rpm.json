@@ -1,0 +1,21 @@
+{
+  "mode": "date_preliminary",
+  "dates": [
+    "20260912",
+    "20260916",
+    "20260919"
+  ],
+  "manifest": null,
+  "run_independence_verified": false,
+  "group_type": "date_not_actual_run",
+  "note": "User-authorized date groups, not actual Run IDs; independent Runs remain unverified.",
+  "development_comparison": true,
+  "test_previously_examined": true,
+  "normalization_mode": "global_train",
+  "baseline_run": "date_prelim_20261106",
+  "only_changed_factor": "normalization",
+  "models": [
+    "autoencoder"
+  ],
+  "no_additional_parameter_search": true
+}

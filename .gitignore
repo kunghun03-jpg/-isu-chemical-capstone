@@ -1,0 +1,56 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+
+# Raw data and model weights
+data/
+*.mat
+*.pth
+*.pt
+*.npz
+
+# Secrets
+.env
+.env.*
+*.pem
+*.key
+credentials.json
+
+# Archives
+*.zip
+
+# OS/editor
+.DS_Store
+Thumbs.db
+
+# Local settings and tools
+.streamlit/
+.codex_tools/
+.vscode/
+
+# Raw datasets and model files
+data/
+*.mat
+*.pth
+*.pt
+*.npz
+
+# Credentials
+.env
+.env.*
+*.pem
+*.key
+credentials.json
+
+# Archives
+*.zip
+
+# Local databases and serialized models
+*.sqlite3
+*.db
+*.joblib

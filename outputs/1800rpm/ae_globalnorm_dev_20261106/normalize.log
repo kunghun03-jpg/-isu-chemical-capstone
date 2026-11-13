@@ -1,0 +1,9 @@
+
+=== 1800RPM / normalize ===
+train: (800, 1, 3201), 유한값 확인 완료
+validation: (824, 1, 3201), 유한값 확인 완료
+test_normal: (816, 1, 3201), 유한값 확인 완료
+test_anomaly: (3136, 1, 3201), 유한값 확인 완료
+정규화 완료!
+
+완료: C:\Users\82106\OneDrive\바탕 화면\isu_chemical\outputs\1800rpm\ae_globalnorm_dev_20261106

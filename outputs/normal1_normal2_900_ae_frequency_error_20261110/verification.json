@@ -1,0 +1,254 @@
+{
+  "verification": [
+    {
+      "file": "20260919_131708_Vib.mat",
+      "existing_file_score": 0.24364550222679912,
+      "frequency_mean": 0.24364550222679912,
+      "absolute_difference": 0.0
+    },
+    {
+      "file": "20260919_145354_Vib.mat",
+      "existing_file_score": 0.4462875947527569,
+      "frequency_mean": 0.446287594752757,
+      "absolute_difference": 5.551115123125783e-17
+    }
+  ],
+  "score_gap": 0.2026420925259578,
+  "focus_band": {
+    "low_hz": 2200,
+    "high_hz": 2600,
+    "upper_inclusive": false,
+    "bins": 128,
+    "normal1_score_contribution": 0.0067864080271605705,
+    "normal2_score_contribution": 0.05919729322519673,
+    "score_gap_contribution": 0.052410885198036154,
+    "percent_of_total_gap": 25.863770228943174
+  },
+  "bands": [
+    {
+      "low_hz": 0,
+      "high_hz": 500,
+      "upper_inclusive": false,
+      "bins": 160,
+      "normal1_score_contribution": 0.1525232017472747,
+      "normal2_score_contribution": 0.14340358403181402,
+      "score_gap_contribution": -0.009119617715460687,
+      "percent_of_total_gap": -4.5003570589819555
+    },
+    {
+      "low_hz": 500,
+      "high_hz": 1000,
+      "upper_inclusive": false,
+      "bins": 160,
+      "normal1_score_contribution": 0.03014709007563431,
+      "normal2_score_contribution": 0.02289730348092628,
+      "score_gap_contribution": -0.0072497865947080305,
+      "percent_of_total_gap": -3.5776311349426853
+    },
+    {
+      "low_hz": 1000,
+      "high_hz": 1500,
+      "upper_inclusive": false,
+      "bins": 160,
+      "normal1_score_contribution": 0.012643302027509882,
+      "normal2_score_contribution": 0.020088434715428705,
+      "score_gap_contribution": 0.007445132687918823,
+      "percent_of_total_gap": 3.674030698713361
+    },
+    {
+      "low_hz": 1500,
+      "high_hz": 2000,
+      "upper_inclusive": false,
+      "bins": 160,
+      "normal1_score_contribution": 0.00834426934120544,
+      "normal2_score_contribution": 0.010954601231276244,
+      "score_gap_contribution": 0.002610331890070804,
+      "percent_of_total_gap": 1.2881489021025723
+    },
+    {
+      "low_hz": 2000,
+      "high_hz": 2500,
+      "upper_inclusive": false,
+      "bins": 160,
+      "normal1_score_contribution": 0.00832243522800541,
+      "normal2_score_contribution": 0.06335255044633817,
+      "score_gap_contribution": 0.05503011521833276,
+      "percent_of_total_gap": 27.156310188261397
+    },
+    {
+      "low_hz": 2500,
+      "high_hz": 3000,
+      "upper_inclusive": false,
+      "bins": 160,
+      "normal1_score_contribution": 0.004109206247988924,
+      "normal2_score_contribution": 0.01633690763739228,
+      "score_gap_contribution": 0.012227701389403354,
+      "percent_of_total_gap": 6.03413695396825
+    },
+    {
+      "low_hz": 3000,
+      "high_hz": 3500,
+      "upper_inclusive": false,
+      "bins": 160,
+      "normal1_score_contribution": 0.003931031244717088,
+      "normal2_score_contribution": 0.014499865950260002,
+      "score_gap_contribution": 0.010568834705542913,
+      "percent_of_total_gap": 5.215517947826698
+    },
+    {
+      "low_hz": 3500,
+      "high_hz": 4000,
+      "upper_inclusive": false,
+      "bins": 160,
+      "normal1_score_contribution": 0.00472687824819468,
+      "normal2_score_contribution": 0.01705111930876496,
+      "score_gap_contribution": 0.012324241060570281,
+      "percent_of_total_gap": 6.081777436734466
+    },
+    {
+      "low_hz": 4000,
+      "high_hz": 4500,
+      "upper_inclusive": false,
+      "bins": 160,
+      "normal1_score_contribution": 0.0039420221320543986,
+      "normal2_score_contribution": 0.03713211719963173,
+      "score_gap_contribution": 0.03319009506757733,
+      "percent_of_total_gap": 16.37867762509696
+    },
+    {
+      "low_hz": 4500,
+      "high_hz": 5000,
+      "upper_inclusive": false,
+      "bins": 160,
+      "normal1_score_contribution": 0.0005313086479229277,
+      "normal2_score_contribution": 0.0031669391834997103,
+      "score_gap_contribution": 0.0026356305355767825,
+      "percent_of_total_gap": 1.3006333001812873
+    },
+    {
+      "low_hz": 5000,
+      "high_hz": 5500,
+      "upper_inclusive": false,
+      "bins": 160,
+      "normal1_score_contribution": 0.0013034047330023142,
+      "normal2_score_contribution": 0.0032328317616283067,
+      "score_gap_contribution": 0.0019294270286259925,
+      "percent_of_total_gap": 0.9521353656466212
+    },
+    {
+      "low_hz": 5500,
+      "high_hz": 6000,
+      "upper_inclusive": false,
+      "bins": 160,
+      "normal1_score_contribution": 0.0016970542984233805,
+      "normal2_score_contribution": 0.005047752954743352,
+      "score_gap_contribution": 0.0033506986563199715,
+      "percent_of_total_gap": 1.653505752212245
+    },
+    {
+      "low_hz": 6000,
+      "high_hz": 6500,
+      "upper_inclusive": false,
+      "bins": 160,
+      "normal1_score_contribution": 0.002181455789215205,
+      "normal2_score_contribution": 0.010290686453630014,
+      "score_gap_contribution": 0.00810923066441481,
+      "percent_of_total_gap": 4.001750358640836
+    },
+    {
+      "low_hz": 6500,
+      "high_hz": 7000,
+      "upper_inclusive": false,
+      "bins": 160,
+      "normal1_score_contribution": 0.001669944518281662,
+      "normal2_score_contribution": 0.02717571426699408,
+      "score_gap_contribution": 0.025505769748712416,
+      "percent_of_total_gap": 12.586609934184928
+    },
+    {
+      "low_hz": 7000,
+      "high_hz": 7500,
+      "upper_inclusive": false,
+      "bins": 160,
+      "normal1_score_contribution": 0.0018505572795564375,
+      "normal2_score_contribution": 0.014900695104739379,
+      "score_gap_contribution": 0.013050137825182941,
+      "percent_of_total_gap": 6.439993617570476
+    },
+    {
+      "low_hz": 7500,
+      "high_hz": 8000,
+      "upper_inclusive": false,
+      "bins": 160,
+      "normal1_score_contribution": 0.0015050342680412877,
+      "normal2_score_contribution": 0.006921812080513972,
+      "score_gap_contribution": 0.005416777812472684,
+      "percent_of_total_gap": 2.673076331255715
+    },
+    {
+      "low_hz": 8000,
+      "high_hz": 8500,
+      "upper_inclusive": false,
+      "bins": 160,
+      "normal1_score_contribution": 0.0015519567831920442,
+      "normal2_score_contribution": 0.006899685647165483,
+      "score_gap_contribution": 0.005347728863973438,
+      "percent_of_total_gap": 2.639001994755069
+    },
+    {
+      "low_hz": 8500,
+      "high_hz": 9000,
+      "upper_inclusive": false,
+      "bins": 160,
+      "normal1_score_contribution": 0.0011393915658885348,
+      "normal2_score_contribution": 0.013957036934764192,
+      "score_gap_contribution": 0.012817645368875658,
+      "percent_of_total_gap": 6.325263033510059
+    },
+    {
+      "low_hz": 9000,
+      "high_hz": 9500,
+      "upper_inclusive": false,
+      "bins": 160,
+      "normal1_score_contribution": 0.0008442301624013031,
+      "normal2_score_contribution": 0.00734702602790194,
+      "score_gap_contribution": 0.006502795865500637,
+      "percent_of_total_gap": 3.2090054857026553
+    },
+    {
+      "low_hz": 9500,
+      "high_hz": 10000,
+      "upper_inclusive": true,
+      "bins": 161,
+      "normal1_score_contribution": 0.0006817278882891684,
+      "normal2_score_contribution": 0.0016309303353441765,
+      "score_gap_contribution": 0.0009492024470550081,
+      "percent_of_total_gap": 0.4684132675610909
+    }
+  ],
+  "source_experiment": "date_prelim_20261106",
+  "normalization": "saved per-frequency Train mean/std",
+  "before_sha256": {
+    "data\\20260919\\20260919_900RPM\\Normal1\\Vib\\20260919_131708_Vib.mat": "4bf1de345c7344d3ef1187ce43304ea36f0e5157a43105e017e4686a295b268d",
+    "data\\20260919\\20260919_900RPM\\Normal2\\Vib\\20260919_145354_Vib.mat": "150990365eea8b3c5a9810dbc276cc22b9b98862c4b9da1aee8a372047267edf",
+    "outputs\\normal1_normal2_900_ae_medians_20261110\\summary.csv": "0b907b30ea66de6b3eeee64313d7998bdd93a77e695940f5c1938aa47626b3a4",
+    "outputs\\inference_bundles\\date_prelim_20261106\\900rpm\\autoencoder.pt": "c3e08ed1ef3187cd623d20e13bf5c3b665ad01eb9dee5e3e8b77b5bfd7b3da44",
+    "outputs\\inference_bundles\\date_prelim_20261106\\900rpm\\iforest.joblib": "8cc8da667db9b4e193468828702390df7c35da16f3a141b2c8b42e6bfc98a00c",
+    "outputs\\inference_bundles\\date_prelim_20261106\\900rpm\\manifest.json": "c64ab804827365c8f763f1e5a802ca599cf2c9894e462027220d403087e51c6c",
+    "outputs\\inference_bundles\\date_prelim_20261106\\900rpm\\normalization.npz": "8d46353987edffaf45499cc9e78135d736f8c99bc2741ec74f2a7adbc4f22b7d",
+    "outputs\\inference_bundles\\date_prelim_20261106\\900rpm\\ocsvm.joblib": "1249fb33dcfc9b9c6a507b60608e322d0ec0bddfe1980bba1e84d361fa155f40"
+  },
+  "after_sha256": {
+    "data\\20260919\\20260919_900RPM\\Normal1\\Vib\\20260919_131708_Vib.mat": "4bf1de345c7344d3ef1187ce43304ea36f0e5157a43105e017e4686a295b268d",
+    "data\\20260919\\20260919_900RPM\\Normal2\\Vib\\20260919_145354_Vib.mat": "150990365eea8b3c5a9810dbc276cc22b9b98862c4b9da1aee8a372047267edf",
+    "outputs\\normal1_normal2_900_ae_medians_20261110\\summary.csv": "0b907b30ea66de6b3eeee64313d7998bdd93a77e695940f5c1938aa47626b3a4",
+    "outputs\\inference_bundles\\date_prelim_20261106\\900rpm\\autoencoder.pt": "c3e08ed1ef3187cd623d20e13bf5c3b665ad01eb9dee5e3e8b77b5bfd7b3da44",
+    "outputs\\inference_bundles\\date_prelim_20261106\\900rpm\\iforest.joblib": "8cc8da667db9b4e193468828702390df7c35da16f3a141b2c8b42e6bfc98a00c",
+    "outputs\\inference_bundles\\date_prelim_20261106\\900rpm\\manifest.json": "c64ab804827365c8f763f1e5a802ca599cf2c9894e462027220d403087e51c6c",
+    "outputs\\inference_bundles\\date_prelim_20261106\\900rpm\\normalization.npz": "8d46353987edffaf45499cc9e78135d736f8c99bc2741ec74f2a7adbc4f22b7d",
+    "outputs\\inference_bundles\\date_prelim_20261106\\900rpm\\ocsvm.joblib": "1249fb33dcfc9b9c6a507b60608e322d0ec0bddfe1980bba1e84d361fa155f40"
+  },
+  "originals_and_models_unchanged": true,
+  "retraining": false,
+  "threshold_changed": false
+}

@@ -1,0 +1,44 @@
+{
+  "segment": {
+    "normal_count": 792,
+    "anomaly_count": 3144,
+    "false_positive_rate": 0.9330808080808081,
+    "specificity": 0.06691919191919193,
+    "detection_rate": 0.9646946564885496,
+    "auroc": 0.7730730491942324,
+    "auprc_average_precision": 0.9419420324161201,
+    "condition_alarm_rates": {
+      "IR": 1.0,
+      "Looseness0.05": 1.0,
+      "Looseness0.1": 1.0,
+      "LoosenessFull": 1.0,
+      "Normal1": 0.8647959183673469,
+      "Normal2": 1.0,
+      "OR": 1.0,
+      "Roller": 1.0,
+      "Unbalance_-1": 0.875,
+      "Unbalance_-2": 0.8307291666666666
+    }
+  },
+  "file": {
+    "normal_count": 99,
+    "anomaly_count": 393,
+    "false_positive_rate": 1.0,
+    "specificity": 0.0,
+    "detection_rate": 0.9974554707379135,
+    "auroc": 0.7834836918806384,
+    "auprc_average_precision": 0.9455361852049791,
+    "condition_alarm_rates": {
+      "IR": 1.0,
+      "Looseness0.05": 1.0,
+      "Looseness0.1": 1.0,
+      "LoosenessFull": 1.0,
+      "Normal1": 1.0,
+      "Normal2": 1.0,
+      "OR": 1.0,
+      "Roller": 1.0,
+      "Unbalance_-1": 0.9782608695652174,
+      "Unbalance_-2": 1.0
+    }
+  }
+}

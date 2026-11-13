@@ -1,0 +1,25 @@
+{
+  "development_comparison": true,
+  "test_previously_examined": true,
+  "only_changed": "normalization",
+  "baseline_normalization": "per_frequency",
+  "comparison_normalization": "global_train",
+  "training_reference": "same RPM; 20260912 Normal1/Normal2 only; all segment/channel/frequency cells",
+  "baseline_run": "date_prelim_20261106",
+  "seed": 42,
+  "batch_size": 32,
+  "optimizer": "Adam",
+  "learning_rate": 0.001,
+  "max_epochs": 30,
+  "patience": 8,
+  "std_floor": 1e-06,
+  "file_aggregation": "arithmetic mean of 8 segment MSE scores",
+  "threshold": "recomputed validation Q95 separately for segment and file scores",
+  "source_code_sha256": {
+    "C:\\Users\\82106\\OneDrive\\바탕 화면\\isu_chemical\\vibration\\evaluate.py": "11be89e18c5f8028121086d79d0a970b90fec1b45cf5177c048ad42419f4a94e",
+    "C:\\Users\\82106\\OneDrive\\바탕 화면\\isu_chemical\\vibration\\file_evaluate.py": "9ed3fbf943d14dcf1b42664d8ccb2ff6a52071869091d747e6e622242b5ae396",
+    "C:\\Users\\82106\\OneDrive\\바탕 화면\\isu_chemical\\vibration\\model.py": "263b45a4fe67db980ab046962ccb87cc5178050484675fbc9c3fb176f0d47780",
+    "C:\\Users\\82106\\OneDrive\\바탕 화면\\isu_chemical\\vibration\\spectra.py": "ddcd01799e411b9ecc5b7ae015cad63ad17d4307126066a2d4506cb0ed08f11c",
+    "C:\\Users\\82106\\OneDrive\\바탕 화면\\isu_chemical\\vibration\\train.py": "58b69acf3cd174a590bbf5292da958058236bad376fb3452e37a098cdddd710b"
+  }
+}

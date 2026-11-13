@@ -1,0 +1,141 @@
+{
+  "data_fingerprint": "90a0cb63951171604bdc5f472d74381413179a62a1cfba760ec06d768d513928",
+  "experiment_mode": "date_preliminary",
+  "group_type": "date_not_actual_run",
+  "run_independence_verified": false,
+  "auprc_definition": "average_precision",
+  "models": {
+    "autoencoder": {
+      "segment": {
+        "normal_count": 816,
+        "anomaly_count": 3136,
+        "false_positive_rate": 0.6703431372549019,
+        "specificity": 0.3296568627450981,
+        "detection_rate": 0.8963647959183674,
+        "auroc": 0.797750350140056,
+        "auprc_average_precision": 0.9472502756424457,
+        "condition_alarm_rates": {
+          "IR": 1.0,
+          "Looseness0.05": 0.875,
+          "Looseness0.1": 1.0,
+          "LoosenessFull": 1.0,
+          "Normal1": 0.3275,
+          "Normal2": 1.0,
+          "OR": 1.0,
+          "Roller": 1.0,
+          "Unbalance_-1": 0.3984375,
+          "Unbalance_-2": 0.8882978723404256
+        }
+      },
+      "file": {
+        "normal_count": 102,
+        "anomaly_count": 392,
+        "false_positive_rate": 0.7450980392156863,
+        "specificity": 0.2549019607843137,
+        "detection_rate": 0.9158163265306123,
+        "auroc": 0.8030712284913966,
+        "auprc_average_precision": 0.9488186919741459,
+        "condition_alarm_rates": {
+          "IR": 1.0,
+          "Looseness0.05": 0.8846153846153846,
+          "Looseness0.1": 1.0,
+          "LoosenessFull": 1.0,
+          "Normal1": 0.48,
+          "Normal2": 1.0,
+          "OR": 1.0,
+          "Roller": 1.0,
+          "Unbalance_-1": 0.4375,
+          "Unbalance_-2": 1.0
+        }
+      }
+    },
+    "ocsvm": {
+      "segment": {
+        "normal_count": 816,
+        "anomaly_count": 3136,
+        "false_positive_rate": 0.7487745098039216,
+        "specificity": 0.2512254901960784,
+        "detection_rate": 0.9094387755102041,
+        "auroc": 0.7917159051120448,
+        "auprc_average_precision": 0.9465814185222976,
+        "condition_alarm_rates": {
+          "IR": 1.0,
+          "Looseness0.05": 0.9254807692307693,
+          "Looseness0.1": 1.0,
+          "LoosenessFull": 1.0,
+          "Normal1": 0.4875,
+          "Normal2": 1.0,
+          "OR": 1.0,
+          "Roller": 1.0,
+          "Unbalance_-1": 0.3828125,
+          "Unbalance_-2": 0.9574468085106383
+        }
+      },
+      "file": {
+        "normal_count": 102,
+        "anomaly_count": 392,
+        "false_positive_rate": 0.7843137254901961,
+        "specificity": 0.21568627450980393,
+        "detection_rate": 0.9107142857142857,
+        "auroc": 0.7981192476990797,
+        "auprc_average_precision": 0.9481782906551496,
+        "condition_alarm_rates": {
+          "IR": 1.0,
+          "Looseness0.05": 0.9423076923076923,
+          "Looseness0.1": 1.0,
+          "LoosenessFull": 1.0,
+          "Normal1": 0.56,
+          "Normal2": 1.0,
+          "OR": 1.0,
+          "Roller": 1.0,
+          "Unbalance_-1": 0.3333333333333333,
+          "Unbalance_-2": 1.0
+        }
+      }
+    },
+    "iforest": {
+      "segment": {
+        "normal_count": 816,
+        "anomaly_count": 3136,
+        "false_positive_rate": 0.5147058823529411,
+        "specificity": 0.4852941176470589,
+        "detection_rate": 0.7346938775510204,
+        "auroc": 0.7755570978391356,
+        "auprc_average_precision": 0.9412767540907626,
+        "condition_alarm_rates": {
+          "IR": 1.0,
+          "Looseness0.05": 0.7596153846153846,
+          "Looseness0.1": 1.0,
+          "LoosenessFull": 1.0,
+          "Normal1": 0.0125,
+          "Normal2": 0.9975961538461539,
+          "OR": 1.0,
+          "Roller": 1.0,
+          "Unbalance_-1": 0.0390625,
+          "Unbalance_-2": 0.034574468085106384
+        }
+      },
+      "file": {
+        "normal_count": 102,
+        "anomaly_count": 392,
+        "false_positive_rate": 0.5098039215686274,
+        "specificity": 0.4901960784313726,
+        "detection_rate": 0.7295918367346939,
+        "auroc": 0.7873649459783912,
+        "auprc_average_precision": 0.9441321628026335,
+        "condition_alarm_rates": {
+          "IR": 1.0,
+          "Looseness0.05": 0.7884615384615384,
+          "Looseness0.1": 1.0,
+          "LoosenessFull": 1.0,
+          "Normal1": 0.0,
+          "Normal2": 1.0,
+          "OR": 1.0,
+          "Roller": 1.0,
+          "Unbalance_-1": 0.0,
+          "Unbalance_-2": 0.0
+        }
+      }
+    }
+  }
+}

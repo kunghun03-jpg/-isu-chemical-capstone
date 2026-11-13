@@ -1,0 +1,6 @@
+{
+  "method": "validation_segment_score_percentile",
+  "percentile": 95,
+  "threshold": 0.3323527614642196,
+  "model_epoch": 30
+}

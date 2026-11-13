@@ -1,0 +1,4 @@
+﻿rpm,train,validation,test_normal,test_anomaly
+900,100,108,100,398
+1200,102,94,99,393
+1800,100,103,102,392

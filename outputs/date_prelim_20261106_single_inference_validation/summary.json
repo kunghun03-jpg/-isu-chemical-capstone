@@ -1,0 +1,96 @@
+{
+  "run_name": "date_prelim_20261106",
+  "raw_test_files": 1484,
+  "file_model_comparisons": 4452,
+  "segment_model_comparisons": 35616,
+  "score_tolerance": {
+    "rtol": 1e-06,
+    "atol": 1e-09
+  },
+  "decision_mismatches": 0,
+  "normalized_arrays_exact_match": true,
+  "audits": [
+    {
+      "rpm": 900,
+      "model": "autoencoder",
+      "files": 498,
+      "matching_file_decisions": 498,
+      "matching_segment_decisions": 3984,
+      "max_file_absolute_difference": 0.0,
+      "max_segment_absolute_difference": 0.0
+    },
+    {
+      "rpm": 900,
+      "model": "ocsvm",
+      "files": 498,
+      "matching_file_decisions": 498,
+      "matching_segment_decisions": 3984,
+      "max_file_absolute_difference": 0.0,
+      "max_segment_absolute_difference": 0.0
+    },
+    {
+      "rpm": 900,
+      "model": "iforest",
+      "files": 498,
+      "matching_file_decisions": 498,
+      "matching_segment_decisions": 3984,
+      "max_file_absolute_difference": 0.0,
+      "max_segment_absolute_difference": 0.0
+    },
+    {
+      "rpm": 1200,
+      "model": "autoencoder",
+      "files": 492,
+      "matching_file_decisions": 492,
+      "matching_segment_decisions": 3936,
+      "max_file_absolute_difference": 0.0,
+      "max_segment_absolute_difference": 0.0
+    },
+    {
+      "rpm": 1200,
+      "model": "ocsvm",
+      "files": 492,
+      "matching_file_decisions": 492,
+      "matching_segment_decisions": 3936,
+      "max_file_absolute_difference": 0.0,
+      "max_segment_absolute_difference": 0.0
+    },
+    {
+      "rpm": 1200,
+      "model": "iforest",
+      "files": 492,
+      "matching_file_decisions": 492,
+      "matching_segment_decisions": 3936,
+      "max_file_absolute_difference": 0.0,
+      "max_segment_absolute_difference": 0.0
+    },
+    {
+      "rpm": 1800,
+      "model": "autoencoder",
+      "files": 494,
+      "matching_file_decisions": 494,
+      "matching_segment_decisions": 3952,
+      "max_file_absolute_difference": 0.0,
+      "max_segment_absolute_difference": 0.0
+    },
+    {
+      "rpm": 1800,
+      "model": "ocsvm",
+      "files": 494,
+      "matching_file_decisions": 494,
+      "matching_segment_decisions": 3952,
+      "max_file_absolute_difference": 0.0,
+      "max_segment_absolute_difference": 0.0
+    },
+    {
+      "rpm": 1800,
+      "model": "iforest",
+      "files": 494,
+      "matching_file_decisions": 494,
+      "matching_segment_decisions": 3952,
+      "max_file_absolute_difference": 0.0,
+      "max_segment_absolute_difference": 0.0
+    }
+  ],
+  "training_performed": false
+}

@@ -1,0 +1,17 @@
+{
+  "mode": "per_frequency",
+  "reference_split": "train",
+  "ddof": 0,
+  "statistic_shape": [
+    1,
+    1,
+    3201
+  ],
+  "std_floor": 1e-06,
+  "train_segments": 800,
+  "train_values": 2560800,
+  "mean_min": 0.00014949033439080496,
+  "mean_max": 0.015296467998996376,
+  "std_min": 0.00010048825476751373,
+  "std_max": 0.008502971193933485
+}

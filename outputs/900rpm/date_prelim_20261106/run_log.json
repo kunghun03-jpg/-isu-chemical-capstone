@@ -1,0 +1,80 @@
+[
+  {
+    "stage": "split",
+    "rpm": 900,
+    "split_mode": "date_preliminary",
+    "note": "user-authorized date groups; not actual Run IDs"
+  },
+  {
+    "stage": "spectra",
+    "rpm": 900,
+    "dates": null,
+    "split_mode": "date_preliminary",
+    "run_manifest": null,
+    "python": "3.14.6 | packaged by Anaconda, Inc. | (main, Jul  9 2026, 14:29:05) [MSC v.1942 64 bit (AMD64)]",
+    "completed_utc": "2026-11-06T10:47:05.902752+00:00"
+  },
+  {
+    "stage": "normalize",
+    "rpm": 900,
+    "dates": null,
+    "split_mode": "date_preliminary",
+    "run_manifest": null,
+    "python": "3.14.6 | packaged by Anaconda, Inc. | (main, Jul  9 2026, 14:29:05) [MSC v.1942 64 bit (AMD64)]",
+    "completed_utc": "2026-11-06T10:47:11.294682+00:00"
+  },
+  {
+    "stage": "train",
+    "rpm": 900,
+    "dates": null,
+    "split_mode": "date_preliminary",
+    "run_manifest": null,
+    "python": "3.14.6 | packaged by Anaconda, Inc. | (main, Jul  9 2026, 14:29:05) [MSC v.1942 64 bit (AMD64)]",
+    "completed_utc": "2026-11-06T10:47:37.750708+00:00"
+  },
+  {
+    "stage": "evaluate",
+    "rpm": 900,
+    "dates": null,
+    "split_mode": "date_preliminary",
+    "run_manifest": null,
+    "python": "3.14.6 | packaged by Anaconda, Inc. | (main, Jul  9 2026, 14:29:05) [MSC v.1942 64 bit (AMD64)]",
+    "completed_utc": "2026-11-06T10:47:43.556197+00:00"
+  },
+  {
+    "stage": "file_evaluate",
+    "rpm": 900,
+    "dates": null,
+    "split_mode": "date_preliminary",
+    "run_manifest": null,
+    "python": "3.14.6 | packaged by Anaconda, Inc. | (main, Jul  9 2026, 14:29:05) [MSC v.1942 64 bit (AMD64)]",
+    "completed_utc": "2026-11-06T10:47:48.715516+00:00"
+  },
+  {
+    "stage": "ocsvm",
+    "rpm": 900,
+    "dates": null,
+    "split_mode": "date_preliminary",
+    "run_manifest": null,
+    "python": "3.14.6 | packaged by Anaconda, Inc. | (main, Jul  9 2026, 14:29:05) [MSC v.1942 64 bit (AMD64)]",
+    "completed_utc": "2026-11-06T10:47:56.265332+00:00"
+  },
+  {
+    "stage": "iforest",
+    "rpm": 900,
+    "dates": null,
+    "split_mode": "date_preliminary",
+    "run_manifest": null,
+    "python": "3.14.6 | packaged by Anaconda, Inc. | (main, Jul  9 2026, 14:29:05) [MSC v.1942 64 bit (AMD64)]",
+    "completed_utc": "2026-11-06T10:48:01.729106+00:00"
+  },
+  {
+    "stage": "compare",
+    "rpm": 900,
+    "dates": null,
+    "split_mode": "date_preliminary",
+    "run_manifest": null,
+    "python": "3.14.6 | packaged by Anaconda, Inc. | (main, Jul  9 2026, 14:29:05) [MSC v.1942 64 bit (AMD64)]",
+    "completed_utc": "2026-11-06T10:48:06.466291+00:00"
+  }
+]

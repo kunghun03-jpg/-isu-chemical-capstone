@@ -1,0 +1,10 @@
+﻿rpm,model,score_direction,aggregation,file_threshold,validation_file_q95,segment_threshold,validation_segment_q95,max_saved_segment_score_difference,max_saved_file_score_difference,status
+900,autoencoder,MSE; higher=anomaly,arithmetic_mean_of_8_segment_scores,0.3242139731159553,0.3242139731159553,0.33143739054219284,0.33143739054219284,0.0,0.0,passed
+900,ocsvm,-score_samples; higher=anomaly,arithmetic_mean_of_8_segment_scores,-0.374341455957232,-0.374341455957232,-0.3040815614748258,-0.3040815614748258,0.0,0.0,passed
+900,iforest,-score_samples; higher=anomaly,arithmetic_mean_of_8_segment_scores,0.4764751544686325,0.4764751544686325,0.48041123685402864,0.48041123685402864,0.0,0.0,passed
+1200,autoencoder,MSE; higher=anomaly,arithmetic_mean_of_8_segment_scores,0.18491544675774046,0.18491544675774046,0.19104118121358435,0.19104118121358435,0.0,0.0,passed
+1200,ocsvm,-score_samples; higher=anomaly,arithmetic_mean_of_8_segment_scores,-1.2956596908774491,-1.2956596908774491,-1.1851959656820135,-1.1851959656820135,0.0,0.0,passed
+1200,iforest,-score_samples; higher=anomaly,arithmetic_mean_of_8_segment_scores,0.4557029190430439,0.4557029190430439,0.458824617387368,0.458824617387368,0.0,0.0,passed
+1800,autoencoder,MSE; higher=anomaly,arithmetic_mean_of_8_segment_scores,0.44546977839014756,0.44546977839014756,0.45654598062412033,0.45654598062412033,0.0,0.0,passed
+1800,ocsvm,-score_samples; higher=anomaly,arithmetic_mean_of_8_segment_scores,-0.18077874532255464,-0.18077874532255464,-0.15796102891199748,-0.15796102891199748,0.0,0.0,passed
+1800,iforest,-score_samples; higher=anomaly,arithmetic_mean_of_8_segment_scores,0.5134232602828925,0.5134232602828925,0.5144388867353206,0.5144388867353206,0.0,0.0,passed

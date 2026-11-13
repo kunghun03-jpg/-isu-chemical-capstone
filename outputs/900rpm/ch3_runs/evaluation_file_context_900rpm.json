@@ -1,0 +1,9 @@
+{
+  "data_fingerprint": "122d4d8b75c89d31a3fd29b53a83760ef06f6c5896068158a0af75b3c4c73dd3",
+  "experiment_mode": "date_preliminary",
+  "group_type": "date_not_actual_run",
+  "run_independence_verified": false,
+  "normalization_mode": "per_frequency",
+  "development_comparison": false,
+  "test_previously_examined": false
+}

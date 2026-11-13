@@ -1,0 +1,15 @@
+{
+  "rpm": 900,
+  "raw_normal_files": 309,
+  "quality_passed": 308,
+  "excluded": 1,
+  "matching_original_pre_z_files": 308,
+  "max_pre_z_spectrum_difference": 0.0,
+  "std_min": 0.00010048825476751373,
+  "std_median": 0.0006496081251269142,
+  "std_max": 0.008502971193933485,
+  "small_std_cutoff": 0.00025534010008979876,
+  "std_floor_bins": 0,
+  "small_std_gain_median": 4287.461034692386,
+  "other_std_gain_median": 1299.288369671864
+}

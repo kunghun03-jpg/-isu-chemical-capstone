@@ -1,0 +1,11 @@
+
+=== 1800RPM / spectra ===
+train: (800, 1, 3201), 사용 파일 100개
+validation: (824, 1, 3201), 사용 파일 103개
+test_normal: (816, 1, 3201), 사용 파일 102개
+test_anomaly: (3136, 1, 3201), 사용 파일 392개
+
+1800RPM 스펙트럼 저장 완료!
+저장 위치: C:\Users\82106\OneDrive\바탕 화면\isu_chemical\outputs\1800rpm\date_prelim_20261106
+
+완료: C:\Users\82106\OneDrive\바탕 화면\isu_chemical\outputs\1800rpm\date_prelim_20261106

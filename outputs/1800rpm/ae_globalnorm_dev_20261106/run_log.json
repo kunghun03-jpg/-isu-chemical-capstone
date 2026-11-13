@@ -1,0 +1,47 @@
+[
+  {
+    "stage": "split",
+    "rpm": 1800,
+    "note": "byte-identical baseline split and pre-Z spectra reused for one-factor development comparison"
+  },
+  {
+    "stage": "normalize",
+    "rpm": 1800,
+    "dates": null,
+    "split_mode": "date_preliminary",
+    "normalization_requested": "global_train",
+    "run_manifest": null,
+    "python": "3.14.6 | packaged by Anaconda, Inc. | (main, Jul  9 2026, 14:29:05) [MSC v.1942 64 bit (AMD64)]",
+    "completed_utc": "2026-11-06T11:39:48.187351+00:00"
+  },
+  {
+    "stage": "train",
+    "rpm": 1800,
+    "dates": null,
+    "split_mode": "date_preliminary",
+    "normalization_requested": "global_train",
+    "run_manifest": null,
+    "python": "3.14.6 | packaged by Anaconda, Inc. | (main, Jul  9 2026, 14:29:05) [MSC v.1942 64 bit (AMD64)]",
+    "completed_utc": "2026-11-06T11:40:55.712614+00:00"
+  },
+  {
+    "stage": "evaluate",
+    "rpm": 1800,
+    "dates": null,
+    "split_mode": "date_preliminary",
+    "normalization_requested": "global_train",
+    "run_manifest": null,
+    "python": "3.14.6 | packaged by Anaconda, Inc. | (main, Jul  9 2026, 14:29:05) [MSC v.1942 64 bit (AMD64)]",
+    "completed_utc": "2026-11-06T11:41:11.336807+00:00"
+  },
+  {
+    "stage": "file_evaluate",
+    "rpm": 1800,
+    "dates": null,
+    "split_mode": "date_preliminary",
+    "normalization_requested": "global_train",
+    "run_manifest": null,
+    "python": "3.14.6 | packaged by Anaconda, Inc. | (main, Jul  9 2026, 14:29:05) [MSC v.1942 64 bit (AMD64)]",
+    "completed_utc": "2026-11-06T11:41:25.449596+00:00"
+  }
+]

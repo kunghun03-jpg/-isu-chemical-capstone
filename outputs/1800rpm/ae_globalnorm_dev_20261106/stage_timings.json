@@ -1,0 +1,26 @@
+[
+  {
+    "rpm": 1800,
+    "stage": "normalize",
+    "wall_seconds": 14.516259200001514,
+    "exit_code": 0
+  },
+  {
+    "rpm": 1800,
+    "stage": "train",
+    "wall_seconds": 69.17627979999816,
+    "exit_code": 0
+  },
+  {
+    "rpm": 1800,
+    "stage": "evaluate",
+    "wall_seconds": 14.891533099998924,
+    "exit_code": 0
+  },
+  {
+    "rpm": 1800,
+    "stage": "file_evaluate",
+    "wall_seconds": 14.083948700001201,
+    "exit_code": 0
+  }
+]

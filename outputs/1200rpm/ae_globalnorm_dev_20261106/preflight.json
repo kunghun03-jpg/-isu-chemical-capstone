@@ -1,0 +1,29 @@
+{
+  "experiment_mode": "date_preliminary",
+  "group_type": "date_not_actual_run",
+  "run_independence_verified": false,
+  "file_count": 2091,
+  "duplicate_paths": 0,
+  "duplicate_content": 0,
+  "quality_hash_matches": 2091,
+  "counts": {
+    "900": {
+      "train": 100,
+      "validation": 108,
+      "test_anomaly": 398,
+      "test_normal": 100
+    },
+    "1200": {
+      "train": 102,
+      "validation": 94,
+      "test_anomaly": 393,
+      "test_normal": 99
+    },
+    "1800": {
+      "train": 100,
+      "validation": 103,
+      "test_anomaly": 392,
+      "test_normal": 102
+    }
+  }
+}

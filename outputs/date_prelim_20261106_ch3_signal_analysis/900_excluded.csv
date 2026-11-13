@@ -1,0 +1,2 @@
+﻿file,date,rpm,condition,run_id,split,source_condition,is_normal,default_included,status,reason,detail,shape,dtype,fs,nan_count,inf_count,extreme_count,ch3_nonfinite_count,ch3_extreme_count,sha256,source_stat_unchanged
+data/20260919/20260919_900RPM/Normal1/Vib/20260919_131845_Vib.mat,20260919,900,Normal1,,,Normal1,1,1,fail,suspect_values,"NaN=0, Inf=0, extreme=34","(6, 65536)",float64,25600.0,0,0,34,0,2,a0f87b0f40735d5b59bfcb6bacb518745d008246f41f3bf5288180da723d712f,1

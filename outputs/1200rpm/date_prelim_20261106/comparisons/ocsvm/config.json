@@ -1,0 +1,54 @@
+{
+  "model": "ocsvm",
+  "parameters": {
+    "cache_size": 200,
+    "coef0": 0.0,
+    "degree": 3,
+    "gamma": "scale",
+    "kernel": "rbf",
+    "max_iter": -1,
+    "nu": 0.05,
+    "shrinking": true,
+    "tol": 0.001,
+    "verbose": false
+  },
+  "channels": [
+    3
+  ],
+  "feature_method": "normalized_CH3_segment_spectrum_3201_bins",
+  "feature_shape": [
+    3201
+  ],
+  "file_aggregation": "mean_of_8_segment_scores",
+  "score_direction": "negative_score_samples; higher_is_more_anomalous",
+  "threshold_method": "normal_validation_Q95_strict_greater_than",
+  "data_fingerprint": "353ca7a38c8b741f1dd22a2b14719eef6b8856463c058be36131e394667cf78e",
+  "experiment_mode": "date_preliminary",
+  "group_type": "date_not_actual_run",
+  "run_independence_verified": false,
+  "fit_partition": "train",
+  "sample_counts": {
+    "train": {
+      "segments": 816,
+      "files": 102
+    },
+    "validation": {
+      "segments": 752,
+      "files": 94
+    },
+    "test_normal": {
+      "segments": 792,
+      "files": 99
+    },
+    "test_anomaly": {
+      "segments": 3144,
+      "files": 393
+    }
+  },
+  "versions": {
+    "python": "3.14.6",
+    "numpy": "2.4.6",
+    "scikit_learn": "1.9.0",
+    "joblib": "1.5.3"
+  }
+}

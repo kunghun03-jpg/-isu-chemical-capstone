@@ -1,0 +1,17 @@
+{
+  "mode": "global_train",
+  "reference_split": "train",
+  "ddof": 0,
+  "statistic_shape": [
+    1,
+    1,
+    1
+  ],
+  "std_floor": 1e-06,
+  "train_segments": 800,
+  "train_values": 2560800,
+  "mean_min": 0.0015906985257519816,
+  "mean_max": 0.0015906985257519816,
+  "std_min": 0.0021809441226431233,
+  "std_max": 0.0021809441226431233
+}
