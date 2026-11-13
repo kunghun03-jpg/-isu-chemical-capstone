@@ -72,7 +72,7 @@ class DashboardV2Tests(unittest.TestCase):
             self.assertNotIn("v2_result", app.session_state)
             self.assertTrue(any(h.value == "분석 대기" for h in app.subheader))
 
-    def test_three_configured_models_match_api_without_changing_their_results(self):
+    def test_three_backends_match_api_and_presentation_v2_requires_ae(self):
         for model in ("autoencoder", "ocsvm", "iforest"):
             with self.subTest(model=model), patch.dict(os.environ, {"ISU_CHEMICAL_V2_MODEL": model}):
                 config = configuration()
@@ -84,6 +84,10 @@ class DashboardV2Tests(unittest.TestCase):
                 with self.upload(), patch("vibration.dae_inference.SavedDAEBundleInference",
                                           side_effect=AssertionError("DAE forbidden")):
                     app = self.app()
+                    if model != 'autoencoder':
+                        self.assertTrue(app.error)
+                        self.assertNotIn('v2_result', app.session_state)
+                        continue
                     app.button(key="v2_run").click().run()
                     self.assertFalse(app.exception)
                     self.assertFalse(app.error)
@@ -114,7 +118,10 @@ class DashboardV2Tests(unittest.TestCase):
             self.assertFalse(any("모델" in s.label for s in app.selectbox))
         with sqlite3.connect(self.db) as connection:
             after = connection.execute("SELECT type,name,sql FROM sqlite_master ORDER BY type,name").fetchall()
-        self.assertEqual(before, after)
+        before_map = {(r[0], r[1]): r[2] for r in before}
+        after_map = {(r[0], r[1]): r[2] for r in after}
+        self.assertTrue(all(after_map[k] == sql for k, sql in before_map.items()))
+        self.assertEqual({r[1] for r in after if r[0] == 'table'} - {r[1] for r in before if r[0] == 'table'}, {'candidate_reports'})
         self.assertEqual(len(store.detail(1)["models"]), 3)
 
     def test_input_rpm_config_changes_clear_stale_results(self):

@@ -12,6 +12,9 @@ from vibration.dashboard_v2 import configuration, bundle_state, analyze, history
 from vibration.detail_ui import spectrum_frame, segment_frame
 from vibration.history import KST, history_csv
 from vibration.web_inference import preview_mat, upload_name, error_message, MODEL_LABELS
+from vibration.candidate_analysis import VERSION as CANDIDATE_VERSION, safe_candidate_analysis
+from vibration.candidate_history import read_candidate
+from vibration.candidate_ui import render_candidate
 
 CSS = """
 <style>
@@ -77,6 +80,12 @@ def render_history_page():
                 "버전": r["model_version"],
             } for r in detail["models"]]), hide_index=True)
             st.caption("기록 추적용 정보입니다. 서로 다른 분석기의 점수 크기는 직접 비교하지 마세요.")
+            candidate = read_candidate(history_store(), selected)
+            render_candidate(candidate)
+            if candidate is not None:
+                st.download_button('저장된 후보 근거 JSON 다운로드',
+                                   json.dumps(candidate, ensure_ascii=False, indent=2, allow_nan=False),
+                                   file_name='candidate_evidence.json', mime='application/json', key='v2_history_candidate_json')
     except Exception:
         st.error("이력을 읽지 못했습니다. 저장 경로와 접근 권한을 확인해 주세요.")
 
@@ -84,7 +93,7 @@ def render_history_page():
 def render_result(result, versions):
     name, item = next(iter(result["models"].items()))
     abnormal = bool(item["predicted_anomaly"])
-    st.subheader("분석 결과")
+    st.subheader("1. AE 이상 탐지 결과")
     notice = st.session_state.pop("v2_save_notice", None)
     if notice:
         (st.success if notice[0] else st.info)(notice[1])
@@ -97,9 +106,13 @@ def render_result(result, versions):
     b.metric("이상 점수", f"{item['file_score']:.6g}")
     c.metric("판정 기준", f"{item['file_threshold']:.6g}")
     st.caption("점수가 기준을 초과하면 이상입니다. 파일 점수는 8개 구간의 평균이며 고장 종류나 설비 안전을 확정하지 않습니다.")
+    candidate = st.session_state.get('v2_candidate')
+    st.divider()
+    render_candidate(candidate)
+    st.divider()
     if st.button("이 결과 저장", key="v2_save", type="primary"):
         try:
-            record_id, created = history_store().save(result, versions)
+            record_id, created = history_store().save(result, versions, candidate_report=candidate)
             if created:
                 st.session_state["v2_save_notice"] = (True, f"분석 #{record_id}을 저장했습니다.")
             else:
@@ -107,7 +120,8 @@ def render_result(result, versions):
             st.rerun()
         except Exception:
             st.error("결과를 저장하지 못했습니다. 저장 경로·권한·디스크 공간을 확인해 주세요.")
-    st.download_button("분석 결과 다운로드", json.dumps(result, ensure_ascii=False, indent=2, allow_nan=False),
+    st.caption('저장 시 AE 판정과 후보 특징·근거를 함께 기록합니다. 원본 MAT와 파형은 DB에 저장하지 않습니다.')
+    st.download_button("분석 결과 다운로드", json.dumps({**result, 'candidate_analysis': candidate}, ensure_ascii=False, indent=2, allow_nan=False),
                        file_name="vibration_result.json", mime="application/json", key="v2_result_json")
     with st.expander("구간별 분석 근거"):
         frame = segment_frame(item)
@@ -118,8 +132,8 @@ def render_result(result, versions):
         st.altair_chart(chart + rule, width="stretch")
         st.caption("구간 기준과 파일 판정 기준은 다릅니다. 일부 구간의 초과만으로 파일 판정을 바꾸지 않습니다.")
     with st.expander("분석기 정보"):
-        st.write(f"현재 임시 분석기: {MODEL_LABELS[name]}")
-        st.caption("대표 분석기는 최종 선정 전입니다. 설정된 기존 모델을 재학습 없이 사용합니다.")
+        st.write('이상 탐지 모델: 1D Convolutional AutoEncoder')
+        st.caption("기존 AE 번들의 전처리·가중치·임계값을 그대로 사용합니다. 결함 후보를 분류하는 모델과는 별개입니다.")
         st.code(versions[name], language=None)
 
 
@@ -136,7 +150,7 @@ def main():
                 '<h1 class="hero-title">회전체 진동 이상 탐지</h1>'
                 '<div class="hero-copy">측정 데이터를 확인하고, 저장 기준에 따라 진동 이상 징후를 점검합니다.</div>',
                 unsafe_allow_html=True)
-    st.info("시험 운영 · 대표 분석기 선정 전입니다. 정상 데이터의 오탐이 보고되어 판정과 측정 파형을 함께 확인해야 합니다.")
+    st.info("연구 시제품 · AE 이상 탐지와 결함 후보 분석은 별개입니다. 정상 오탐이 보고되어 파형·측정 조건도 함께 확인하세요.")
     if page == "분석 이력":
         render_history_page()
         return
@@ -152,10 +166,14 @@ def main():
     three.metric("측정 방식", "MAT 파일")
     try:
         config = configuration()
+        if config.model != 'autoencoder':
+            raise ValueError('발표용 V2는 AE만 사용합니다. ISU_CHEMICAL_V2_MODEL=autoencoder로 설정하세요.')
     except ValueError as error:
         st.session_state.pop("v2_result", None)
         st.session_state.pop("v2_versions", None)
         st.session_state.pop("v2_save_notice", None)
+        st.session_state.pop('v2_candidate', None)
+        st.session_state.pop('v2_signal_details', None)
         st.error("분석기 설정을 확인해 주세요. 관리자 설정이 유효하지 않습니다.")
         with st.expander("설정 진단"):
             st.write(str(error))
@@ -172,11 +190,13 @@ def main():
             st.caption(state["message"])
             raw = upload.getvalue() if upload is not None else None
             identity = (hashlib.sha256(raw).hexdigest() if raw else None, rpm,
-                        upload_name(upload.name) if upload else None, config, state["stamp"])
+                        upload_name(upload.name) if upload else None, config, state["stamp"], CANDIDATE_VERSION)
             if st.session_state.get("v2_identity") != identity:
                 st.session_state.pop("v2_result", None)
                 st.session_state.pop("v2_versions", None)
                 st.session_state.pop("v2_save_notice", None)
+                st.session_state.pop('v2_candidate', None)
+                st.session_state.pop('v2_signal_details', None)
             st.session_state["v2_identity"] = identity
             preview = None
             if upload is not None:
@@ -194,10 +214,14 @@ def main():
                          disabled=preview is None or not state["files_present"]):
                 st.session_state.pop("v2_result", None)
                 st.session_state.pop("v2_versions", None)
+                st.session_state.pop('v2_candidate', None)
+                st.session_state.pop('v2_signal_details', None)
                 try:
                     with st.spinner("진동 이상 징후를 분석하고 있습니다…"):
                         result, versions = analyze(raw, rpm, upload_name(upload.name), config)
+                        candidate, signal_details = safe_candidate_analysis(raw, rpm)
                     st.session_state["v2_result"], st.session_state["v2_versions"] = result, versions
+                    st.session_state['v2_candidate'], st.session_state['v2_signal_details'] = candidate, signal_details
                 except Exception as error:
                     st.error("분석을 완료하지 못했습니다: " + error_message(error))
             st.caption("원본 업로드는 저장하지 않습니다. 분석 결과는 저장 버튼을 눌렀을 때만 기록됩니다.")
@@ -212,12 +236,29 @@ def main():
                 render_result(result, st.session_state["v2_versions"])
     if preview is not None:
         st.subheader("진동 데이터")
-        wave, spectrum = st.tabs(("CH3 시간 파형", "주파수 스펙트럼"))
+        wave, spectrum, ae_spectrum = st.tabs(("CH3 시간 파형", "FFT 진폭 스펙트럼", "AE 입력 스펙트럼"))
         with wave:
             st.line_chart(pd.DataFrame({"시간 (초)": preview["time"], "CH3 진폭": preview["signal"]}),
                           x="시간 (초)", y="CH3 진폭", color="#247cb6")
             st.caption("원본 CH3 진폭입니다. 센서 물리 단위는 아직 확정되지 않았습니다.")
         with spectrum:
+            details = st.session_state.get('v2_signal_details')
+            if details is None:
+                st.info('분석 실행 후 결함 후보 검토에 사용한 전체 기록 FFT가 표시됩니다.')
+            else:
+                frame = pd.DataFrame({'주파수 (Hz)': details['frequency'], 'FFT 진폭': details['amplitude']})
+                display = st.radio('FFT 표시 범위', ('전체 0–10kHz', '저주파 0–200Hz'), horizontal=True, key='v2_fft_range')
+                if display == '저주파 0–200Hz':
+                    frame = frame[frame['주파수 (Hz)'] <= 200]
+                # Embed values directly: whole-record FFT can exceed Altair's default 5000-row limit.
+                chart = alt.Chart(alt.Data(values=frame.to_dict('records'))).mark_line(color='#247cb6').encode(
+                    x=alt.X('주파수 (Hz):Q'), y=alt.Y('FFT 진폭:Q'))
+                orders = pd.DataFrame({'주파수 (Hz)': [rpm / 60., rpm / 30.], '회전 성분': ['명목 1X', '명목 2X']})
+                lines = alt.Chart(orders).mark_rule(color='#cc7850', strokeDash=[4, 4]).encode(
+                    x='주파수 (Hz):Q', tooltip=['회전 성분', '주파수 (Hz)'])
+                st.altair_chart(chart + lines, width='stretch')
+                st.caption('전체 기록 평균 제거 · 대칭 Hann · 단측 진폭 보정 · 명목 1X/2X 표시. 선의 존재만으로 결함을 판정하지 않습니다.')
+        with ae_spectrum:
             st.line_chart(spectrum_frame(preview), x="주파수 (Hz)", y="8구간 log1p 평균", color="#247cb6")
             st.caption("Hann FFT의 log1p 진폭 · 8구간 평균 · 학습 기준 Z-score 적용 전")
 
