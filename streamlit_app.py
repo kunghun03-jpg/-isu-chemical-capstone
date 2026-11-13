@@ -8,6 +8,7 @@ import pandas as pd
 import streamlit as st
 
 from vibration.inference import SavedModelInference
+from vibration.dae_ui import bundle_status, preview_dae_mat, predict_dae, render_dae_result
 from vibration.history_ui import save_result, render_history
 from vibration.detail_ui import render_details
 from vibration.web_inference import (
@@ -39,7 +40,16 @@ def main():
         "기존 주파수별 Train 정규화와 저장 임계값을 사용합니다. 분석 중 재학습이나 임계값 재계산은 없습니다."
     )
     rpm = st.selectbox("RPM", (900, 1200, 1800))
-    choice = st.selectbox("모델", tuple(MODEL_OPTIONS))
+    choice = st.selectbox("모델", tuple(MODEL_OPTIONS) + ("DAE",))
+    dae = bundle_status(rpm)
+    st.caption(f"DAE 상태: {dae['label']}")
+    if choice == "DAE" or choice == "전체":
+        if not dae["ready"]:
+            st.info(f"DAE: {dae['label']}. DAE 판정을 실행하지 않습니다.")
+    dae_stamp = (dae["folder"], dae["id"], dae["label"], rpm)
+    if st.session_state.get("dae_stamp") != dae_stamp:
+        st.session_state.pop("dae_result", None)
+    st.session_state["dae_stamp"] = dae_stamp
     st.caption(
         "RPM은 파일의 실제 측정 조건에 맞게 선택하세요. 파일명이나 폴더의 상태 이름은 판정에 사용하지 않습니다."
     )
@@ -54,6 +64,7 @@ def main():
     )
     if st.session_state.get("input_identity") != identity:
         st.session_state.pop("analysis_result", None)
+        st.session_state.pop("dae_result", None)
         st.session_state["input_identity"] = identity
     if raw is None:
         st.info(
@@ -63,7 +74,7 @@ def main():
         render_history()
         return
     try:
-        preview = preview_mat(raw)
+        preview = preview_dae_mat(raw) if choice == "DAE" else preview_mat(raw)
     except Exception as error:
         st.error("입력 파일 확인: " + error_message(error))
         st.button("분석 실행", disabled=True)
@@ -81,23 +92,31 @@ def main():
         y="CH3 진폭",
     )
     st.caption("원본 CH3 진폭입니다. 물리 단위는 센서·수집 설정 확인이 필요합니다.")
-    if st.button("분석 실행", type="primary"):
+    if st.button("분석 실행", type="primary", disabled=choice == "DAE" and not dae["ready"]):
         st.session_state.pop("analysis_result", None)
-        try:
-            with st.spinner("저장 모델로 분석 중입니다…"):
-                engine = load_engine(rpm, MODEL_OPTIONS[choice])
-                st.session_state["analysis_result"] = engine.predict_bytes(
-                    raw, rpm=rpm, filename=upload_name(uploaded.name)
-                )
-                st.session_state["model_versions"] = {
-                    name: "sha256:"
-                    + engine.manifest["artifacts"][
-                        engine.manifest["models"][name]["artifact"]
-                    ]
-                    for name in engine.models
-                }
-        except Exception as error:
-            st.error("분석할 수 없습니다: " + error_message(error))
+        st.session_state.pop("dae_result", None)
+        if choice != "DAE":
+            try:
+                with st.spinner("저장 모델로 분석 중입니다…"):
+                    engine = load_engine(rpm, MODEL_OPTIONS[choice])
+                    st.session_state["analysis_result"] = engine.predict_bytes(
+                        raw, rpm=rpm, filename=upload_name(uploaded.name)
+                    )
+                    st.session_state["model_versions"] = {
+                        name: "sha256:"
+                        + engine.manifest["artifacts"][
+                            engine.manifest["models"][name]["artifact"]
+                        ]
+                        for name in engine.models
+                    }
+            except Exception as error:
+                st.error("분석할 수 없습니다: " + error_message(error))
+        if choice in ("DAE", "전체") and dae["ready"]:
+            try:
+                with st.spinner("DAE 저장 모델로 분석 중입니다…"):
+                    st.session_state["dae_result"] = predict_dae(raw, rpm, dae["id"])
+            except Exception as error:
+                st.warning(f"DAE 분석 실패: {error}")
     result = st.session_state.get("analysis_result")
     if result is not None:
         st.subheader("분석 결과")
@@ -130,6 +149,8 @@ def main():
         )
         save_result(result, st.session_state.get("model_versions", {}))
         render_details(result, preview)
+    if st.session_state.get("dae_result") is not None:
+        render_dae_result(st.session_state["dae_result"])
     st.caption(
         "원본 업로드 파일은 저장하지 않습니다. 결과 저장 버튼을 누른 분석 정보만 SQLite에 저장합니다. 결함 후보 추정은 후속 단계입니다."
     )
