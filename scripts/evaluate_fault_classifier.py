@@ -140,6 +140,9 @@ def load_eda(folder):
 class LearnedRules:
     """One training-selected threshold per non-Normal class, deterministic conflict priority."""
 
+    def __init__(self, features=FEATURES):
+        self.features = tuple(features)
+
     def fit(self, x, labels):
         labels = np.asarray(labels)
         self.rules = []
@@ -148,7 +151,7 @@ class LearnedRules:
             if not positive.any() or positive.all():
                 continue
             best, best_key = None, None
-            for column, feature in enumerate(FEATURES):
+            for column, feature in enumerate(self.features):
                 values = np.unique(x[:, column])
                 # Include boundaries so constant features can be recognized as uninformative.
                 thresholds = np.unique(np.r_[values[0], values[:-1] + np.diff(values) / 2, values[-1]])
@@ -184,13 +187,13 @@ class LearnedRules:
         return np.asarray(labels), evidence
 
 
-def fit_models(x_train, y_train):
+def fit_models(x_train, y_train, features=FEATURES):
     # No scaling is needed for axis-threshold rules or RF. Both see exactly the same imputed columns.
     imputer = SimpleImputer(strategy='median', keep_empty_features=True)
     x = imputer.fit_transform(x_train)
     if not np.isfinite(x).all():
         raise ValueError('Nonfinite training preprocessing result')
-    rules = LearnedRules().fit(x, y_train)
+    rules = LearnedRules(features).fit(x, y_train)
     forest = RandomForestClassifier(**RF_CONFIG).fit(x, y_train)
     return imputer, rules, forest
 
@@ -251,9 +254,9 @@ def distributions(rows, output):
     return summary
 
 
-def evaluate_rows(rows):
+def evaluate_rows(rows, features=FEATURES):
     predictions, folds, thresholds, importance, medians = [], [], [], [], []
-    x_all = np.asarray([r['values'] for r in rows], dtype=float).reshape(-1, len(FEATURES))
+    x_all = np.asarray([r['values'] for r in rows], dtype=float).reshape(-1, len(features))
     y_all = np.asarray([r['label'] for r in rows])
     for protocol, rpm, date, train, test in fold_specs(rows):
         identifier = f'{protocol}_{rpm}_{date}'
@@ -280,18 +283,18 @@ def evaluate_rows(rows):
         if len(fold['train_dates']) < 2:
             fold['limitations'].append('Only one training date; weak evidence of generalization')
         # Fit once on training dates; no test labels enter preprocessing or model fitting.
-        imputer, rules, forest = fit_models(x_all[train], y_all[train])
+        imputer, rules, forest = fit_models(x_all[train], y_all[train], features)
         x_test = imputer.transform(x_all[test])
         if not np.isfinite(x_test).all():
             raise ValueError(f'{identifier}: nonfinite test preprocessing; no partial comparison')
         rule_labels, evidence = rules.predict(x_test)
         rf_labels, votes = forest.predict(x_test), forest.predict_proba(x_test)
-        for feature, median in zip(FEATURES, imputer.statistics_):
+        for feature, median in zip(features, imputer.statistics_):
             medians.append({'fold_id': identifier, 'feature': feature, 'training_median_or_zero': float(median),
-                            'all_training_values_missing': bool(np.isnan(x_all[train, FEATURES.index(feature)]).all())})
+                            'all_training_values_missing': bool(np.isnan(x_all[train, features.index(feature)]).all())})
         for priority, rule in enumerate(rules.rules, 1):
             thresholds.append({'fold_id': identifier, 'priority': priority, **rule})
-        for feature, value in zip(FEATURES, forest.feature_importances_):
+        for feature, value in zip(features, forest.feature_importances_):
             importance.append({'fold_id': identifier, 'protocol': protocol, 'test_rpm': rpm, 'test_date': date,
                                'feature': feature, 'impurity_importance': float(value)})
         for j, i in enumerate(test):
