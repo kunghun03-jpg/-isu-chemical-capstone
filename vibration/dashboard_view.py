@@ -10,6 +10,7 @@ import streamlit as st
 
 from vibration.candidate_analysis import FEATURE_LABELS
 from vibration.history import KST
+from vibration.candidate_decision_ui import render_decision
 
 WAVE_ICON = '<svg width="40" height="30" viewBox="0 0 44 32" fill="none"><path d="M2 17h8l4-12 6 24 6-22 4 10h12" stroke="#2585ff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg>'
 CSS = '''<style>
@@ -154,17 +155,8 @@ def candidate_card(report):
         st.markdown('<div class="candidate-banner neutral"><div class="overline">AE 분석 후 확인</div><strong>결과 대기</strong></div>', unsafe_allow_html=True)
         st.caption('AE 이상일 때만 후보 엔진을 실행합니다.')
         return
-    # Keep native metric semantics for accessibility and existing tests.
-    with st.container(key='panel_candidate_skipped' if report['status']=='skipped_normal' else 'panel_candidate_status'):
-        st.metric('결함 후보', report['candidate'])
-    st.caption('확정 진단이 아닌 탐색적 후보 · 분류 점수는 신뢰도가 아닙니다.')
-    reasons = report.get('reasons', [])
-    if reasons:
-        st.info(reasons[0])
-        if len(reasons) > 1:
-            with st.expander(f'추가 보류 사유 {len(reasons)-1}개'):
-                for reason in reasons[1:]:
-                    st.info(reason)
+    render_decision(report, prefix='dashboard', compact=True)
+    st.caption('모델 참고 예측은 오분류될 수 있습니다. 분류 점수는 신뢰도나 보정된 확률이 아닙니다.')
     if report.get('failure'):
         st.warning(report['failure'])
     engine = report.get('engine')
