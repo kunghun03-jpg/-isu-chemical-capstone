@@ -14,7 +14,7 @@ from vibration.candidate_decision_ui import render_decision
 
 WAVE_ICON = '<svg width="40" height="30" viewBox="0 0 44 32" fill="none"><path d="M2 17h8l4-12 6 24 6-22 4 10h12" stroke="#2585ff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg>'
 CSS = '''<style>
-:root{--ink:#14243d;--muted:#6e7e94;--blue:#1769ff;--navy:#101f3c;--line:#dce4f2;--surface:#f3f6fc}
+:root{--ink:#14243d;--muted:#465a76;--blue:#1769ff;--navy:#101f3c;--line:#dce4f2;--surface:#f3f6fc}
 .stApp{background:var(--surface);color:var(--ink);font-family:Inter,"Noto Sans KR",sans-serif}
 .block-container{max-width:1880px;padding:.25rem 1rem 1.1rem}
 [data-testid="stHeader"]{background:transparent;height:0;min-height:0;pointer-events:none!important}
@@ -58,7 +58,7 @@ CSS = '''<style>
 .st-key-panel_candidate_skipped{background:#edf9f5;border-color:#c8eade;box-shadow:none;padding:12px}
 .st-key-panel_candidate_status [data-testid="stMetricValue"],.st-key-panel_candidate_skipped [data-testid="stMetricValue"]{white-space:normal;overflow-wrap:anywhere;font-size:1.22rem}
 h1{font-size:1.4rem!important;letter-spacing:-.03em}h2{font-size:1.2rem!important}h3{font-size:1.04rem!important;letter-spacing:-.02em;padding-top:0!important;padding-bottom:16px!important}
-[data-testid="stCaptionContainer"]{font-size:11px;line-height:1.6;color:var(--muted)}
+[data-testid="stCaptionContainer"]{font-size:13px;line-height:1.65;color:var(--muted)}
 [data-testid="stMetricValue"]{font-size:1.3rem;font-weight:750;color:var(--ink)}
 [data-testid="stMetricLabel"]{font-size:12px;color:var(--muted)}
 [data-testid="stButton"] button[kind="primary"]{background:linear-gradient(135deg,#287fff,#075cf3);border:0;color:white;border-radius:8px;font-weight:650;min-height:42px}
@@ -72,11 +72,11 @@ h1{font-size:1.4rem!important;letter-spacing:-.03em}h2{font-size:1.2rem!importan
 .candidate-banner{background:linear-gradient(110deg,#fff8e7,#fffdf6);border:1px solid #ffdfa4;border-radius:9px;padding:15px 14px;margin-bottom:12px;overflow-wrap:anywhere}
 .candidate-banner.neutral{background:#f2f6fd;border-color:#dce6f5}.candidate-banner .overline{font-size:11px;color:#92713c;margin-bottom:6px}.candidate-banner strong{font-size:20px;color:#172a43}
 .observation{padding:9px 0;border-bottom:1px solid #edf1f8;font-size:12px;line-height:1.7}.observation:last-child{border:0}.observation b{display:inline-block;width:75px;color:#1e3960}.observation span{color:#677b95}
-.feature-table{width:100%;border-collapse:collapse;font-size:12px}.feature-table th{background:#f1f4fa;color:#364a68;text-align:left;padding:7px;border-bottom:1px solid #dae3f1}.feature-table td{padding:6px 7px;border-bottom:1px solid #e9eef7;color:#52657d}.feature-table td:last-child{text-align:right;color:#172d4b;font-weight:650;font-variant-numeric:tabular-nums;white-space:nowrap}
-.summary-label{font-size:10px;color:#6d809a;margin:8px 0 3px}.summary-value{font-size:12px;color:#213b5b;overflow-wrap:anywhere;line-height:1.6}.summary-title{font-size:13px;font-weight:750;color:#14396c;margin-bottom:9px}
+.feature-table{width:100%;border-collapse:collapse;font-size:13px}.feature-table th{background:#f1f4fa;color:#364a68;text-align:left;padding:7px;border-bottom:1px solid #dae3f1}.feature-table td{padding:6px 7px;border-bottom:1px solid #e9eef7;color:#52657d}.feature-table td:last-child{text-align:right;color:#172d4b;font-weight:650;font-variant-numeric:tabular-nums;white-space:nowrap}
+.summary-label{font-size:12px;color:#465a76;margin:8px 0 3px}.summary-value{font-size:12px;color:#213b5b;overflow-wrap:anywhere;line-height:1.6}.summary-title{font-size:13px;font-weight:750;color:#14396c;margin-bottom:9px}
 .st-key-panel_summary_data,.st-key-panel_summary_ae,.st-key-panel_summary_candidate,.st-key-panel_summary_evidence{padding:9px;box-shadow:none;background:#f8fbff}.summary-label{margin-top:5px}.summary-title{margin-bottom:5px}
 .st-key-panel_actions{background:#fafffc;border-color:#d3e9de}.st-key-panel_actions button[kind="primary"]{background:linear-gradient(135deg,#08b884,#009567)}
-.research-note{font-size:11px;color:#7e8ba0;margin:2px 0 8px}
+.research-note{font-size:13px;color:#465a76;margin:2px 0 8px}
 @media(min-width:1051px){[data-testid="stSidebar"]{width:244px!important;min-width:244px!important;max-width:244px!important}.st-key-v2_mobile_nav{display:none}}
 @media(max-width:1050px){
  .block-container{padding:.25rem 12px 1rem}
@@ -87,6 +87,9 @@ h1{font-size:1.4rem!important;letter-spacing:-.03em}h2{font-size:1.2rem!importan
  .st-key-panel_topbar [data-testid="stHorizontalBlock"]{flex-wrap:wrap}
  .st-key-panel_topbar [data-testid="stColumn"]{flex:1 1 100%;width:100%;min-width:0}
 }
+[data-testid="stCaptionContainer"] p{font-size:13px!important;color:#465a76!important;line-height:1.65}
+.st-key-panel_topbar .top-status{font-size:13px}
+button:focus-visible,a:focus-visible{outline:3px solid #1769ff!important;outline-offset:3px}
 </style>'''
 
 # Decorative SVGs avoid OS-dependent missing glyphs; native radio inputs remain accessible.
@@ -114,7 +117,23 @@ def navigate(page):
     st.session_state['v2_page'] = page
 
 
-def header(state, result):
+def app_status(state, result, error=None):
+    """Report observable state; file presence does not prove successful loading."""
+    if error:
+        return '분석 실패 · 입력·환경 확인 필요', False
+    if result:
+        return '분석 완료 · 결과 저장 가능', True
+    if state and state['files_present']:
+        return '분석 대기 · AE 파일 확인됨 (로딩 미검증)', False
+    return '분석 불가 · AE 파일·설정 확인 필요', False
+
+
+def ae_status(result):
+    item = result['models']['autoencoder'] if result else None
+    return ('이상' if item['predicted_anomaly'] else '정상') if item else '대기'
+
+
+def header(state, result, error=None):
     with st.container(key='panel_topbar'):
         title, status, settings = st.columns([2.4, 1.5, .55], vertical_alignment='center')
         with title:
@@ -124,8 +143,7 @@ def header(state, result):
                     for i,page in enumerate(('홈 대시보드','데이터 업로드','분석 이력','통계 및 리포트','시스템 설정')):
                         st.button(page,key=f'v2_nav_{i}',on_click=navigate,args=(page,),width='stretch')
         with status:
-            present = state and state['files_present']
-            text = '선택 RPM의 AE 파일 확인' if present else 'AE 파일·설정 확인 필요'
+            text, present = app_status(state, result, error)
             st.markdown(f'<div class="top-status"><span class="dot {"" if present else "wait"}"></span>{text}<br>{escape(analyzed_time(result))} · KST</div>', unsafe_allow_html=True)
         with settings:
             st.button('⚙ 설정', key='v2_open_settings', on_click=navigate, args=('시스템 설정',), width='stretch')
@@ -134,10 +152,10 @@ def header(state, result):
 def ae_card(result):
     st.subheader('1. AE 이상 탐지 결과')
     item = result['models']['autoencoder'] if result else None
-    status = '이상' if item and item['predicted_anomaly'] else '정상' if item else '대기'
+    status = ae_status(result)
     kind = 'alert' if status == '이상' else '' if item else 'pending'
     subtitle = '기준 초과' if status == '이상' else '기준 이내' if item else 'MAT 분석 전'
-    st.markdown(f'<div class="status-center"><div class="status-ring {kind}">{status}<small>{subtitle}</small></div><div class="status-copy">1D Conv AutoEncoder<br>CH3 · 8구간 평균<br>파일 단위 이상 탐지</div></div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="status-center"><div class="status-ring {kind}" role="status" aria-label="AE 판정: {status}" data-ae-status="{status}">{status}<small>{subtitle}</small></div><div class="status-copy">1D Conv AutoEncoder<br>CH3 · 8구간 평균<br>파일 단위 이상 탐지</div></div>', unsafe_allow_html=True)
     if item:
         a, b = st.columns(2)
         a.metric('이상 점수', f"{item['file_score']:.6g}")
@@ -165,7 +183,7 @@ def candidate_card(report):
         names={'Bearing':'베어링','Unbalance':'불평형','Looseness':'느슨함','Normal':'정상(원시)'}
         values = [{'클래스': names.get(key,key), '분류 점수': value} for key, value in engine['scores_uncalibrated'].items()]
         st.altair_chart(alt.Chart(pd.DataFrame(values)).mark_bar(color='#2578ff',cornerRadiusEnd=3).encode(
-            x=alt.X('분류 점수:Q',title=None,axis=alt.Axis(tickCount=4),scale=alt.Scale(domain=[0, 1])),
+            x=alt.X('분류 점수:Q',title='RF 모델 점수 · 미보정',axis=alt.Axis(tickCount=4),scale=alt.Scale(domain=[0, 1])),
             y=alt.Y('클래스:N',title=None,sort='-x')).properties(height=130), width='stretch')
     elif report.get('features'):
         f = report['features']
@@ -210,7 +228,7 @@ def rotation_frame(report, rpm):
 
 def chart(data, x, y, color='#2274ff', height=145):
     return alt.Chart(alt.Data(values=data.to_dict('records'))).mark_line(color=color,strokeWidth=1.3).encode(
-        x=alt.X(x,axis=alt.Axis(grid=True,tickCount=5)),y=alt.Y(y,axis=alt.Axis(grid=True,tickCount=4))).properties(height=height)
+        x=alt.X(x,axis=alt.Axis(grid=True,tickCount=5,labelFontSize=12,titleFontSize=13,titlePadding=10)),y=alt.Y(y,axis=alt.Axis(grid=True,tickCount=4,labelFontSize=12,titleFontSize=13,titlePadding=10))).properties(height=height)
 
 
 def visualization_row(preview, details, report, rpm):
