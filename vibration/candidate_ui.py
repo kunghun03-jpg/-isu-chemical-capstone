@@ -3,6 +3,7 @@ import pandas as pd
 import streamlit as st
 
 from vibration.candidate_analysis import FEATURE_LABELS
+from vibration.candidate_decision_ui import render_decision
 
 
 def render_candidate(report):
@@ -10,10 +11,8 @@ def render_candidate(report):
     if report is None:
         st.info('이 기록에는 결함 후보 근거가 없습니다. 새 분석에서 확인할 수 있습니다.')
         return
-    st.metric('결함 후보', report['candidate'])
+    render_decision(report, prefix='detail')
     st.caption('이상 탐지와 별도 결과입니다. 확정 진단이 아닌 탐색적 결함 후보이며 실제 점검이 필요합니다.')
-    for reason in report.get('reasons', []):
-        st.info(reason)
     if report['status'] == 'unavailable':
         st.warning(report['failure'])
         return

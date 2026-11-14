@@ -12,6 +12,7 @@ from vibration.web_inference import preview_mat, upload_name, error_message
 from vibration.candidate_analysis import STAGE_VERSION as CANDIDATE_VERSION, analyze_with_engine
 from vibration.candidate_engine import bundle_identity as candidate_bundle_identity
 from vibration.candidate_ui import render_candidate
+from vibration.candidate_decision_ui import decision_view
 from vibration.dashboard_pages import render_history_page, render_reports, render_settings
 from vibration.dashboard_view import (CSS, WAVE_ICON, ae_card, analyzed_time, candidate_card,
     chart, features_card, header, navigate, number, summary_card, visualization_row)
@@ -20,7 +21,7 @@ PAGES = ('홈 대시보드', '데이터 업로드', '분석 이력', '통계 및
 
 
 def clear_result():
-    for key in ('v2_result', 'v2_versions', 'v2_candidate', 'v2_signal_details', 'v2_save_notice'):
+    for key in ('v2_result', 'v2_versions', 'v2_candidate', 'v2_signal_details', 'v2_save_notice', 'v2_analysis_error'):
         st.session_state.pop(key, None)
 
 
@@ -62,6 +63,7 @@ def input_panel(config):
                     st.session_state['v2_result'], st.session_state['v2_versions'] = result, versions
                     st.session_state['v2_candidate'], st.session_state['v2_signal_details'] = candidate, details
                 except Exception as error:
+                    st.session_state['v2_analysis_error'] = error_message(error)
                     st.error('분석을 완료하지 못했습니다: ' + error_message(error))
         if preview:
             st.caption(f"입력 확인 · {upload_name(upload.name)} · {preview['samples']:,} 샘플 · {preview['duration']:.2f}초 · CH3 · 원본은 저장하지 않습니다.")
@@ -104,7 +106,8 @@ def summary(result, candidate):
                 summary_card('2. AE 이상 탐지',[('상태',('이상' if item['predicted_anomaly'] else '정상') if item else '분석 대기'),
                     ('점수',number(item['file_score']) if item else '—'),('임계값',number(item['file_threshold']) if item else '—')],'panel_summary_ae')
             with c:
-                summary_card('3. 결함 후보',[('후보',candidate['candidate'] if candidate else '분석 대기'),
+                summary_card('3. RF 예측과 최종 후보',[('모델 참고 예측',decision_view(candidate)['raw_label'] if candidate else '분석 대기'),
+                    ('최종 후보',candidate['candidate'] if candidate else '분석 대기'),
                     ('분석 상태',{'candidate':'후보 제시','abstained':'판정 보류','skipped_normal':'정상 · 추정 생략','unclear':'근거 부족','unavailable':'계산 불가'}.get(candidate['status'],candidate['status']) if candidate else '대기'),
                     ('보류·생략 사유',' / '.join(candidate.get('reasons',[])) if candidate else 'AE 분석 후 확인')],'panel_summary_candidate')
             with d:
@@ -166,7 +169,7 @@ def main():
     top = st.container()
     if page in ('분석 이력','통계 및 리포트','시스템 설정'):
         with top:
-            header(bundle_state(config,st.session_state.get('v2_rpm',900)) if config else None,st.session_state.get('v2_result'))
+            header(bundle_state(config,st.session_state.get('v2_rpm',900)) if config else None,st.session_state.get('v2_result'),st.session_state.get('v2_analysis_error'))
         {'분석 이력':render_history_page,'통계 및 리포트':render_reports,'시스템 설정':lambda:render_settings(config,error)}[page]()
         return
     if config is None:
@@ -181,7 +184,7 @@ def main():
     preview,rpm,state = input_panel(config)
     result,candidate = st.session_state.get('v2_result'),st.session_state.get('v2_candidate')
     with top:
-        header(state,result)
+        header(state,result,st.session_state.get('v2_analysis_error'))
     with st.container(key='v2_results_row'):
         ae,fault,features = st.columns([1.,1.18,1.03],gap='small')
         with ae,st.container(key='panel_ae'):
