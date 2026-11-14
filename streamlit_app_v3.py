@@ -14,6 +14,7 @@ from vibration.dae_ui import bundle_status
 from vibration.web_inference import preview_mat,error_message,upload_name
 from vibration.candidate_analysis import analyze_with_engine
 from vibration.candidate_engine import bundle_identity
+from vibration.normal_comparison_ui import render_normal_comparison
 from vibration.v3_presentation import (CSS as RESPONSIVE_CSS, dae_diagnostics, hero,
     overview, model_tiles, signal_panel, advice_panel, guide_page)
 
@@ -144,6 +145,7 @@ def main():
                 render_settings(config,None)
                 with st.expander('DAE 번들 진단 · 읽기 전용'): st.json(dae_diagnostics(st.session_state.get('v2_rpm',900)))
                 performance()
+                render_normal_comparison()
         else: guide_page()
         return
     top=st.container()
