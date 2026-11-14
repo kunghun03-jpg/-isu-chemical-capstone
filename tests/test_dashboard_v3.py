@@ -86,9 +86,9 @@ class V3Tests(unittest.TestCase):
             self.assertEqual(len(app.session_state['v3_rows']),4)
             app.button(key='v3_save').click().run();self.assertFalse(app.exception)
             app.radio(key='v2_page').set_value('분석 이력').run();self.assertFalse(app.exception)
-            app.radio(key='v2_page').set_value('모델 성능 비교').run();self.assertFalse(app.exception)
+            app.radio(key='v2_page').set_value('모델 정보').run();self.assertFalse(app.exception)
             self.assertTrue(any(i.value=='평가 자료 없음' for i in app.info))
-            app.radio(key='v2_page').set_value('홈 대시보드').run()
+            app.radio(key='v2_page').set_value('분석하기').run()
             app.selectbox(key='v2_rpm').set_value(1200).run()
             self.assertNotIn('v2_result',app.session_state);self.assertNotIn('v3_rows',app.session_state)
 

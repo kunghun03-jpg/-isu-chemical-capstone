@@ -1,47 +1,38 @@
-"""V3 reference-model dashboard. V2 and operational AE/RF remain unchanged."""
+"""Existing Streamlit dashboard; presentation changes only, same launch entry point."""
 import hashlib
 import json
 import os
 from pathlib import Path
-import altair as alt
 import pandas as pd
 import streamlit as st
 import streamlit_app_v2 as v2
 from vibration.dashboard_v2 import configuration,history_store,bundle_state
-from vibration.dashboard_view import CSS,WAVE_ICON,app_status,analyzed_time,ae_card,candidate_card,features_card,visualization_row,summary_card
+from vibration.dashboard_view import CSS,WAVE_ICON,candidate_card,features_card
 from vibration.dashboard_pages import render_history_page,render_reports,render_settings
-from vibration.dashboard_v3 import references,rotation_orders,save_references,read_references,MODELS,analyze_selected
+from vibration.dashboard_v3 import references,save_references,read_references,MODELS,analyze_selected
 from vibration.dae_ui import bundle_status
 from vibration.web_inference import preview_mat,error_message,upload_name
 from vibration.candidate_analysis import analyze_with_engine
 from vibration.candidate_engine import bundle_identity
-from vibration.v3_presentation import CSS as RESPONSIVE_CSS,dae_diagnostics
+from vibration.v3_presentation import (CSS as RESPONSIVE_CSS, dae_diagnostics, hero,
+    overview, model_tiles, signal_panel, advice_panel, guide_page)
 
-PAGES=('홈 대시보드','데이터 업로드','분석 이력','통계 및 리포트','모델 성능 비교','시스템 설정')
+PAGES=('분석하기','분석 이력','모델 정보','사용 가이드')
 
 
 def header(state,result,error=None):
-    with st.container(key='panel_topbar'):
-        title,status,settings=st.columns([2.4,1.5,.6],vertical_alignment='center')
-        with title:
-            st.markdown('<div class="top-title">Rotating Machinery<br>Fault Diagnosis System · V3</div>',unsafe_allow_html=True)
-        with status:
-            text,ready=app_status(state,result,error)
-            st.markdown('<div class="top-status">'+text+'<br>'+analyzed_time(result)+' · KST</div>',unsafe_allow_html=True)
-        with settings:
-            st.button('⚙ 설정',key='v3_settings',on_click=v2.navigate,args=('시스템 설정',))
+    hero(state,result,error)
 
 
 def input_panel(config):
     with st.container(key='v2_input_card'):
-        st.subheader('진동 데이터 분석 · V3')
-        a,b,c=st.columns([3,1,1],vertical_alignment='bottom')
-        with a: upload=st.file_uploader('MAT 파일 업로드',type=['mat'],key='v3_upload')
-        with b: rpm=st.selectbox('측정 RPM',(900,1200,1800),key='v2_rpm')
+        st.subheader('❶ 분석 데이터 입력')
+        upload=st.file_uploader('MAT 파일 업로드',type=['mat'],key='v3_upload')
+        rpm=st.selectbox('측정 RPM',(900,1200,1800),key='v2_rpm')
         raw=upload.getvalue() if upload is not None else None
         folder=config.bundle_root/f'{rpm}rpm'
         stamps=tuple(sorted((p.name,p.stat().st_size,p.stat().st_mtime_ns) for p in folder.iterdir() if p.is_file())) if folder.is_dir() else ()
-        identity=(hashlib.sha256(raw).hexdigest() if raw else None,rpm,config,stamps,bundle_identity(),bundle_status(rpm))
+        identity=(hashlib.sha256(raw).hexdigest() if raw else None,upload_name(upload.name) if upload else None,rpm,config,stamps,bundle_identity(),bundle_status(rpm))
         if st.session_state.get('v3_input_identity')!=identity:
             v2.clear_result();st.session_state.pop('v3_rows',None)
         st.session_state['v3_input_identity']=identity
@@ -49,8 +40,7 @@ def input_panel(config):
         if raw:
             try: preview=preview_mat(raw)
             except Exception as error: st.error('입력 오류: '+error_message(error))
-        with c:
-            run=st.button('▶ 분석 시작',key='v3_run',type='primary',disabled=preview is None or 'v2_result' in st.session_state)
+        run=st.button('▶ 분석 시작',key='v3_run',type='primary',width='stretch',disabled=preview is None or 'v2_result' in st.session_state)
         if run and 'v2_result' not in st.session_state:
             v2.clear_result();st.session_state.pop('v3_rows',None)
             try:
@@ -65,8 +55,8 @@ def input_panel(config):
                 st.session_state['v2_analysis_error']=error_message(error)
                 st.error('분석 오류: '+error_message(error))
         if st.session_state.get('v2_analysis_error'): st.error('분석 오류: '+st.session_state['v2_analysis_error'])
-        if 'v2_result' in st.session_state: st.caption('동일 입력의 중복 실행을 막았습니다. 파일 또는 RPM 변경 시 새 분석이 가능합니다.')
-        st.caption((upload_name(upload.name)+' · ' if upload else '')+'CH3 · 65,536 samples · 25,600Hz · 원본은 DB에 저장하지 않습니다.')
+        if 'v2_result' in st.session_state: st.caption('동일 입력의 중복 실행 방지 · 파일/RPM 변경 시 새 분석')
+        st.caption('CH3 · 65,536샘플 · 25,600Hz · 원본은 저장하지 않습니다.')
     return preview,rpm,{'files_present':(folder/'manifest.json').is_file()}
 
 
@@ -100,87 +90,89 @@ def performance():
     except Exception as error: st.error('평가 자료를 읽지 못했습니다: '+str(error))
 
 
-def main():
-    st.set_page_config(page_title='V3 다중 AI 진동 진단',page_icon='◈',layout='wide',initial_sidebar_state='expanded')
-    st.markdown(CSS+RESPONSIVE_CSS+'<style>[data-testid=stSidebar] [data-testid=stCaptionContainer] p{color:#c6d7f0!important}.top-title{font-size:17px}.st-key-panel_models{min-width:0}</style>',unsafe_allow_html=True)
-    with st.sidebar:
-        st.markdown('<div class="sidebar-brand">'+WAVE_ICON+'<div>Rotating Machinery<br>Fault Diagnosis System · V3</div></div>',unsafe_allow_html=True)
-        page=st.radio('작업 화면',PAGES,key='v2_page',label_visibility='collapsed')
-        st.markdown('<div class="sidebar-note">MAT · 65,536샘플<br>25,600Hz · CH3<br>900 / 1200 / 1800RPM<br><br>로컬 운영 화면<br>관리자 로그인 기능 없음</div>',unsafe_allow_html=True)
-    try:
-        config=configuration()
-        if config.model!='autoencoder': raise ValueError('운영 기준은 autoencoder여야 합니다.')
-    except Exception as error:
-        st.error(str(error));return
-    if page not in ('홈 대시보드','데이터 업로드'):
-        header(bundle_state(config,st.session_state.get('v2_rpm',900)),st.session_state.get('v2_result'),st.session_state.get('v2_analysis_error'))
-        if page=='분석 이력':
-            render_history_page()
-            selected=st.session_state.get('v2_history_detail')
-            if selected:
-                try:
-                    rows=read_references(history_store(),selected)
-                    if rows:
-                        st.subheader('저장된 추가 모델 참고 결과');model_table(rows)
-                    else: st.info('기존 V2 기록: 추가 모델 참고 결과 없음')
-                except Exception as error: st.error(str(error))
-        elif page=='통계 및 리포트': render_reports()
-        elif page=='모델 성능 비교': performance()
-        else:
-            render_settings(config,None)
-            st.write('DAE 번들 점검:',dae_diagnostics(st.session_state.get('v2_rpm',900)))
-        return
-    top=st.container()
-    preview,rpm,state=input_panel(config)
-    result=st.session_state.get('v2_result');candidate=st.session_state.get('v2_candidate');details=st.session_state.get('v2_signal_details')
-    rows=st.session_state.get('v3_rows')
-    with top:
-        header(state,result,st.session_state.get('v2_analysis_error'))
-        st.caption('V3 · AE 운영 기준 / 추가 모델 참고 비교 · 준비 상태는 모델별 실제 실행 결과에서 확인합니다.')
-    with st.container(key='v2_results_row'):
-        a,b,c=st.columns([1,1.4,1.2],gap='small')
-        with a,st.container(key='panel_ae'):
-            st.subheader('종합 진단 · 운영 기준 AE');ae_card(result)
-        with b,st.container(key='panel_models'):
-            st.subheader('모델별 이상 탐지 결과')
+def history_page():
+    render_history_page()
+    selected=st.session_state.get('v2_history_detail')
+    if selected:
+        try:
+            rows=read_references(history_store(),selected)
             if rows:
-                model_table(rows)
-                with st.expander('DAE가 모델 미준비인 이유 확인'):
-                    st.json(dae_diagnostics(rpm))
-            else: st.info('분석 대기 · 실제 모델 결과 없음')
-        with c,st.container(key='panel_candidate'):
-            candidate_card(candidate)
-            if candidate and candidate.get('engine'): st.caption('RF 모델 버전: '+candidate['engine']['model_version'])
-    with st.container(key='panel_features'):features_card(candidate)
-    visualization_row(preview,details,candidate,rpm)
-    if preview:
-        with st.expander('시간 파형 확대 · 드래그/휠 탐색'):
-            frame=pd.DataFrame({'시간 (초)':preview['time'],'CH3 진폭 (raw)':preview['signal']})
-            st.altair_chart(alt.Chart(frame).mark_line(color='#2478ff').encode(x='시간 (초):Q',y='CH3 진폭 (raw):Q').interactive(),width='stretch')
-    if details:
-        with st.container(key='panel_orders_v3'):
-            st.subheader('실측 스펙트럼 회전 성분 · 1X–5X')
-            orders=rotation_orders(details,rpm)
-            st.altair_chart(alt.Chart(orders).mark_bar(color='#8257df').encode(x='회전 성분:N',y='진폭 (raw):Q',tooltip=list(orders.columns)),width='stretch')
-            st.dataframe(orders,hide_index=True,width='stretch')
-            st.caption('명목 RPM/60 × 차수 · ±1Hz 피크 탐색 (bin 해상도 고려) · 결함 진단 기준 아님')
-    with st.container(key='panel_summary'):
-        st.subheader('분석 결과 요약')
-        a,b,c,d=st.columns(4)
-        with a:summary_card('데이터 정보',[('파일',result['input']['name'] if result else '대기'),('RPM',rpm)],'panel_v3_data')
-        with b:summary_card('모델별 판정',[(r['label'],r['decision']) for r in rows] if rows else [('상태','대기')],'panel_v3_models')
-        with c:summary_card('RF 참고 예측',[('원시 예측',(candidate.get('engine') or {}).get('raw_prediction','실행 결과 없음') if candidate else '대기'),('최종 후보',candidate['candidate'] if candidate else '대기')],'panel_v3_rf')
-        with d:summary_card('판정 근거',[('운영 기준','AE 저장 임계값'),('보류 사유',' / '.join(candidate.get('reasons',[])) if candidate else '대기')],'panel_v3_reason')
+                st.subheader('저장된 추가 모델 참고 결과');model_table(rows)
+            else: st.info('기존 V2 기록: 추가 모델 참고 결과 없음')
+        except Exception as error: st.error(str(error))
+    with st.expander('저장 이력 통계 및 리포트'):
+        render_reports()
+
+
+def actions(result,candidate,rows):
     with st.container(key='panel_actions'):
         st.subheader('결과 저장 및 이력')
-        if st.button('결과 저장하기',key='v3_save',disabled=not result or not rows,type='primary'):
+        if st.button('결과 저장하기',key='v3_save',disabled=not result or not rows,type='primary',width='stretch'):
             try:
                 ident,created=save_references(history_store(),result,st.session_state['v2_versions'],candidate,rows)
                 st.success(f'분석 #{ident} 저장 완료' if created else f'기존 분석 #{ident} 확인 완료')
             except Exception as error: st.error('저장 실패 (AE 기록만 저장됐을 수 있습니다): '+str(error))
-        st.button('분석 이력 조회 →',on_click=v2.navigate,args=('분석 이력',))
+        st.button('분석 이력 조회 →',on_click=v2.navigate,args=('분석 이력',),width='stretch')
         if result:
-            st.download_button('분석 결과 JSON',json.dumps({**result,'candidate_analysis':candidate,'reference_models':rows},ensure_ascii=False,indent=2,allow_nan=False),file_name='v3_vibration_result.json',mime='application/json')
+            st.download_button('분석 결과 JSON',json.dumps({**result,'candidate_analysis':candidate,'reference_models':rows},ensure_ascii=False,indent=2,allow_nan=False),file_name='v3_vibration_result.json',mime='application/json',width='stretch')
+        st.caption('기존 SQLite에 저장 · 원본 MAT와 파형은 저장하지 않습니다.')
+
+
+def main():
+    st.set_page_config(page_title='회전체 진동 이상 감지 시스템',page_icon='◈',layout='wide',initial_sidebar_state='auto')
+    # Shared V2 presentation remains untouched; overrides are scoped to this existing entry point.
+    st.html(CSS+RESPONSIVE_CSS)
+    legacy_pages={'홈 대시보드':'분석하기','데이터 업로드':'분석하기','통계 및 리포트':'분석 이력','모델 성능 비교':'모델 정보','시스템 설정':'모델 정보'}
+    if st.session_state.get('v2_page') in legacy_pages:
+        st.session_state['v2_page']=legacy_pages[st.session_state['v2_page']]
+    with st.sidebar:
+        st.markdown('<div class="sidebar-brand">'+WAVE_ICON+'<div>회전체 진동<br>이상 감지 시스템</div></div>',unsafe_allow_html=True)
+        page=st.radio('작업 화면',PAGES,key='v2_page',label_visibility='collapsed')
+        st.markdown('<div class="sidebar-note"><strong>ⓘ 시스템 안내</strong><br>진동 분석으로 설비 점검을 지원합니다. 결함을 확정 진단하는 장비가 아닙니다.<hr>MAT · CH3 · 25,600Hz<br>900 / 1200 / 1800 RPM<br>파일 기반 분석 · 실시간 수집 아님</div>',unsafe_allow_html=True)
+    try:
+        config=configuration()
+        if config.model!='autoencoder': raise ValueError('운영 기준은 autoencoder여야 합니다.')
+    except Exception as error:
+        header(None,None,str(error));st.error(str(error));return
+    if page!='분석하기':
+        header(bundle_state(config,st.session_state.get('v2_rpm',900)),st.session_state.get('v2_result'),st.session_state.get('v2_analysis_error'))
+        if page=='분석 이력': history_page()
+        elif page=='모델 정보':
+            with st.container(key='panel_model_info'):
+                st.subheader('모델 정보 및 적용 제한')
+                st.write('운영 판정은 AE 저장 임계값을 사용합니다. OCSVM·IF는 참고 비교이며 점수 척도가 다릅니다. DAE는 지원 범위와 성능 검증이 필요합니다.')
+                render_settings(config,None)
+                with st.expander('DAE 번들 진단 · 읽기 전용'): st.json(dae_diagnostics(st.session_state.get('v2_rpm',900)))
+                performance()
+        else: guide_page()
+        return
+    top=st.container()
+    with st.container(key='v3_workspace'):
+        input_column,result_column=st.columns([1,3.15],gap='medium')
+        with input_column:
+            preview,rpm,state=input_panel(config)
+        result=st.session_state.get('v2_result');candidate=st.session_state.get('v2_candidate');details=st.session_state.get('v2_signal_details');rows=st.session_state.get('v3_rows')
+        with result_column,st.container(key='panel_results'):
+            st.subheader('❷ 분석 결과 요약')
+            overview(rpm,state,result,st.session_state.get('v2_analysis_error'))
+            st.markdown('**모델별 판정 결과**')
+            model_tiles(rows)
+            with st.expander('모델별 점수·임계값·버전·실행 상태'):
+                if rows: model_table(rows)
+                else: st.info('분석 대기 · 실제 모델 결과 없음')
+                st.caption('종합 판정은 기존 운영 기준인 AE 결과입니다. 모델 점수 평균·정규화·투표를 사용하지 않습니다.')
+    with top: header(state,result,st.session_state.get('v2_analysis_error'))
+    with st.container(key='v3_evidence_row'):
+        signal_column,summary_column=st.columns([2.2,1],gap='medium')
+        with signal_column:
+            signal_panel(preview,details,candidate,rpm,result)
+        with summary_column:
+            advice_panel(result,candidate,rows)
+            actions(result,candidate,rows)
+    with st.expander('RF 참고 예측과 최종 후보 · 상세 근거',expanded=False):
+        candidate_card(candidate)
+        if candidate and candidate.get('engine'): st.caption('RF 모델 버전: '+candidate['engine']['model_version'])
+        features_card(candidate)
     v2.details_panel(result,candidate,preview,details)
 
 if __name__=='__main__': main()
