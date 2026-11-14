@@ -3,6 +3,8 @@
 from copy import deepcopy
 import hashlib
 import json
+import logging
+import os
 from pathlib import Path
 import shutil
 
@@ -69,7 +71,7 @@ def check_rpm(manifest, rpm):
         raise ValueError(f"DAE 번들이 지원하지 않는 RPM: {rpm}")
 
 
-def load_manifest(folder):
+def load_integrity_manifest(folder):
     folder = Path(folder).resolve()
     try:
         manifest = json.loads((folder / "manifest.json").read_text(encoding="utf-8"))
@@ -93,8 +95,8 @@ def load_manifest(folder):
         raise ValueError("지원하지 않는 DAE 모델·전처리·점수 규격")
     validate_rpm_metadata(manifest["supported_rpms"], manifest["rpm_evidence"])
     versions = manifest["runtime_versions"]
-    if not isinstance(versions, dict) or versions != runtime_versions():
-        raise ValueError("DAE 번들의 NumPy/SciPy/PyTorch 버전과 실행 환경이 다릅니다.")
+    if not isinstance(versions,dict) or set(versions)!={"numpy","scipy","torch"} or not all(isinstance(v,str) and v for v in versions.values()):
+        raise ValueError("DAE runtime_versions 형식 오류")
     try:
         valid_id = manifest_id(manifest)
     except (TypeError, ValueError) as error:
@@ -116,6 +118,22 @@ def load_manifest(folder):
             raise FileNotFoundError(f"DAE 번들 파일 누락: {path}")
         if sha256_file(path) != checksum:
             raise ValueError(f"DAE 파일 SHA256 불일치: {name}")
+    return manifest
+
+
+def load_manifest(folder):
+    manifest=load_integrity_manifest(folder)
+    expected,actual=manifest['runtime_versions'],runtime_versions()
+    if expected!=actual:
+        logging.getLogger(__name__).warning('DAE runtime mismatch: expected=%s actual=%s bundle_id=%s',expected,actual,manifest['bundle_id'])
+        report=os.environ.get('ISU_CHEMICAL_DAE_RUNTIME_REPORT','')
+        if not report:
+            raise ValueError('DAE 번들의 NumPy/SciPy/PyTorch 버전과 실행 환경이 다릅니다. 검증된 호환성 보고서가 필요합니다.')
+        from vibration.dae_runtime_compat import validate_report
+        try:
+            validate_report(report,manifest)
+        except Exception as error:
+            raise ValueError(f'DAE 실행 환경 호환성 근거 검증 실패: {type(error).__name__}: {error}') from error
     return manifest
 
 
