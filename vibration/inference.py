@@ -19,7 +19,7 @@ from vibration.preprocessing import (
 
 
 class SavedModelInference:
-    def __init__(self, bundle_dir, models=MODEL_NAMES):
+    def __init__(self, bundle_dir, models=MODEL_NAMES, *, selected_artifacts_only=False):
         self.folder = Path(bundle_dir).resolve()
         self.manifest = json.loads(
             (self.folder / "manifest.json").read_text(encoding="utf-8")
@@ -56,6 +56,8 @@ class SavedModelInference:
         if np.__version__ != manifest["versions"]["numpy"]:
             raise ValueError("검증된 전처리를 위해 패키지와 NumPy 버전을 맞추세요.")
         for name, checksum in manifest["artifacts"].items():
+            if selected_artifacts_only and name not in required:
+                continue
             if Path(name).name != name or sha256_file(self.folder / name) != checksum:
                 raise ValueError("추론 파일 해시 또는 경로 불일치")
         with np.load(
