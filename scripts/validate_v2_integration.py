@@ -27,7 +27,7 @@ def digest(path):
     return hashlib.sha256(Path(path).read_bytes()).hexdigest()
 
 
-def load_cases(path, data_root):
+def load_cases(path, data_root, require_reference=True):
     """Condition/path are audit metadata, never inference features."""
     with Path(path).open(encoding='utf-8-sig', newline='') as f:
         rows = list(csv.DictReader(f))
@@ -35,10 +35,11 @@ def load_cases(path, data_root):
         raise ValueError('Test 목록이 비었습니다.')
     seen = set()
     for row in rows:
-        if not all(row.get(k) for k in ('path', 'rpm', 'raw_prediction')):
+        if not all(row.get(k) for k in ('path', 'rpm')) or (require_reference and not row.get('raw_prediction')):
             raise ValueError('path/rpm/raw_prediction 필수 열 오류')
+        row.setdefault('raw_prediction','')
         row['rpm'] = int(row['rpm'])
-        if row['rpm'] not in (900,1200,1800) or row['raw_prediction'] not in ('Normal','Bearing','Looseness','Unbalance'):
+        if row['rpm'] not in (900,1200,1800) or row.get('raw_prediction','') not in (('Normal','Bearing','Looseness','Unbalance') if require_reference else ('','Normal','Bearing','Looseness','Unbalance')):
             raise ValueError('RPM 또는 오프라인 클래스 오류')
         path = Path(row['path']).expanduser()
         row['resolved_path'] = str((path if path.is_absolute() else Path(data_root)/path).resolve())
@@ -54,6 +55,8 @@ def compare(ae_abnormal, raw_prediction, offline):
         return 'skipped_ae_normal'
     if raw_prediction is None:
         return 'rf_unavailable'
+    if not offline:
+        return 'no_offline_reference'
     return 'match' if raw_prediction == offline else 'mismatch'
 
 
@@ -94,12 +97,21 @@ def run(args):
     output=Path(args.output).expanduser().resolve()
     if output == ROOT or ROOT in output.parents:
         raise ValueError('출력은 Git 저장소 밖이어야 합니다.')
-    cases=load_cases(args.test_predictions,args.data_root)
+    cases=load_cases(args.test_predictions,args.data_root) if args.test_predictions else []
+    additional=getattr(args,'additional_cases',None)
+    if additional:
+        extra=load_cases(additional,args.data_root,require_reference=False)
+        keys={(c['resolved_path'],c['rpm']) for c in cases}
+        if any((c['resolved_path'],c['rpm']) in keys for c in extra):
+            raise ValueError('추가 목록과 Test 목록의 중복 파일/RPM')
+        cases.extend(extra)
+    if not cases: raise ValueError('검증 파일 목록이 비었습니다.')
     # mkdir without exist_ok forbids overwriting existing results/DBs.
     output.mkdir(parents=True)
     ae_root=Path(args.ae_bundles).expanduser().resolve()
     rf=Path(args.rf_bundle).expanduser().resolve()
-    snapshot={str(p):digest(p) for p in [Path(args.test_predictions),rf/'manifest.json',rf/'training_report.json',rf/'model.joblib'] if p.is_file()}
+    snapshot={str(p):digest(p) for p in ([Path(args.test_predictions)] if args.test_predictions else [])+[rf/'manifest.json',rf/'training_report.json',rf/'model.joblib'] if p.is_file()}
+    if additional: snapshot[str(Path(additional))]=digest(additional)
     try:
         rf_manifest=json.loads((rf/'manifest.json').read_text())
     except (OSError, ValueError):
@@ -158,8 +170,8 @@ def run(args):
     summary={'data_kind':args.data_kind,'executed_at_utc':datetime.now(timezone.utc).isoformat(),'files':len(results),
              'comparison_counts':dict(counts),'conditions':dict(Counter(r.get('condition','unknown') for r in results)),
              'comparison_by_rpm':{str(rpm):dict(Counter(r['comparison'] for r in comparisons if r['rpm']==rpm)) for rpm in (900,1200,1800)},
-             'reference_csv':str(Path(args.test_predictions).resolve()),
-             'reference_is_bundle_test_csv':Path(args.test_predictions).resolve()==rf/'test_predictions.csv',
+             'reference_csv':str(Path(args.test_predictions).resolve()) if args.test_predictions else None,
+             'reference_is_bundle_test_csv':bool(args.test_predictions and Path(args.test_predictions).resolve()==rf/'test_predictions.csv'),
              'ae_bundle_root':str(ae_root),'rf_bundle':str(rf),
              'unrepresented_conditions':[c for c in ('Normal1','Normal2','IR','OR','Roller','Unbalance_-1','Unbalance_-2','Looseness0.05','Looseness0.1','LoosenessFull') if not any(r.get('condition')==c for r in results)],
              'labels_enabled_setting':previous['ISU_CHEMICAL_CANDIDATE_LABELS'] or '0',
@@ -184,7 +196,8 @@ def run(args):
 
 def main():
     p=argparse.ArgumentParser(description=__doc__)
-    p.add_argument('--test-predictions',required=True);p.add_argument('--data-root',default=str(ROOT))
+    p.add_argument('--additional-cases',help='추가 MAT 목록; raw_prediction은 공란 허용')
+    p.add_argument('--test-predictions');p.add_argument('--data-root',default=str(ROOT))
     p.add_argument('--ae-bundles',required=True);p.add_argument('--rf-bundle',required=True)
     p.add_argument('--output',required=True);p.add_argument('--data-kind',choices=['actual','synthetic'],required=True)
     args=p.parse_args(); summary=run(args);print(json.dumps(summary,ensure_ascii=False,indent=2));return 0 if summary['passed'] else 1
