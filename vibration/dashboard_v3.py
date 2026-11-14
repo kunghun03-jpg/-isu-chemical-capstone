@@ -7,7 +7,8 @@ from contextlib import closing
 import numpy as np
 import pandas as pd
 from vibration.inference import SavedModelInference
-from vibration.dae_ui import bundle_status, predict_dae
+from vibration.dae_ui import predict_dae
+from vibration.dae_readiness import probe as bundle_status
 from scripts.analyze_fault_signatures import peak_component
 
 MODELS={'autoencoder':'AE (기준)','dae':'DAE','ocsvm':'One-Class SVM','iforest':'Isolation Forest'}
@@ -30,7 +31,7 @@ def references(raw,rpm,config,ae):
             if model=='dae':
                 state=bundle_status(rpm)
                 if not state['ready']:
-                    row.update(status='실행 오류' if state['label']=='모델 검증 실패' else state['label'],reason=state.get('reason',state['label']))
+                    row.update(status='실행 오류' if state.get('code') in ('hash_error','manifest_error','model_load_error') or state['label']=='모델 검증 실패' else state['label'],reason=state.get('reason',state['label']))
                     rows.append(row);continue
                 result=predict_dae(raw,rpm,state['id'])
                 row.update(score=result['mse'],threshold=result['threshold'],decision=result['prediction'],version=state['id'],rule='파일 전체 Welch 복원 MSE > 저장 임계값')
