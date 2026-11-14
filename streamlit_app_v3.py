@@ -15,6 +15,7 @@ from vibration.dae_ui import bundle_status
 from vibration.web_inference import preview_mat,error_message,upload_name
 from vibration.candidate_analysis import analyze_with_engine
 from vibration.candidate_engine import bundle_identity
+from vibration.v3_presentation import CSS as RESPONSIVE_CSS,dae_diagnostics
 
 PAGES=('홈 대시보드','데이터 업로드','분석 이력','통계 및 리포트','모델 성능 비교','시스템 설정')
 
@@ -100,8 +101,8 @@ def performance():
 
 
 def main():
-    st.set_page_config(page_title='V3 다중 AI 진동 진단',page_icon='◈',layout='wide')
-    st.markdown(CSS+'<style>[data-testid=stSidebar] [data-testid=stCaptionContainer] p{color:#c6d7f0!important}.top-title{font-size:17px}.st-key-panel_models{min-width:0}</style>',unsafe_allow_html=True)
+    st.set_page_config(page_title='V3 다중 AI 진동 진단',page_icon='◈',layout='wide',initial_sidebar_state='expanded')
+    st.markdown(CSS+RESPONSIVE_CSS+'<style>[data-testid=stSidebar] [data-testid=stCaptionContainer] p{color:#c6d7f0!important}.top-title{font-size:17px}.st-key-panel_models{min-width:0}</style>',unsafe_allow_html=True)
     with st.sidebar:
         st.markdown('<div class="sidebar-brand">'+WAVE_ICON+'<div>Rotating Machinery<br>Fault Diagnosis System · V3</div></div>',unsafe_allow_html=True)
         page=st.radio('작업 화면',PAGES,key='v2_page',label_visibility='collapsed')
@@ -127,7 +128,7 @@ def main():
         elif page=='모델 성능 비교': performance()
         else:
             render_settings(config,None)
-            st.write('DAE 상태:',bundle_status(st.session_state.get('v2_rpm',900)))
+            st.write('DAE 번들 점검:',dae_diagnostics(st.session_state.get('v2_rpm',900)))
         return
     top=st.container()
     preview,rpm,state=input_panel(config)
@@ -142,7 +143,10 @@ def main():
             st.subheader('종합 진단 · 운영 기준 AE');ae_card(result)
         with b,st.container(key='panel_models'):
             st.subheader('모델별 이상 탐지 결과')
-            if rows:model_table(rows)
+            if rows:
+                model_table(rows)
+                with st.expander('DAE가 모델 미준비인 이유 확인'):
+                    st.json(dae_diagnostics(rpm))
             else: st.info('분석 대기 · 실제 모델 결과 없음')
         with c,st.container(key='panel_candidate'):
             candidate_card(candidate)
