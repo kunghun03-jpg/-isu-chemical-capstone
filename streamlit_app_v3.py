@@ -766,10 +766,121 @@ def main():
                                 st.warning(f"RF 결함 후보: {candidate.get('candidate', '결함 후보 보류')}")
                                 st.caption('RF 검증 정책을 통과한 참고 후보이며, 확정 진단은 아닙니다.')
                             else:
-                                st.info('RF 결함 후보: 보류')
-                                st.caption('RF 검증 기준 미충족 또는 후보 분석 결과 없음.')
+                                rf = (
+                                    candidate.get('engine')
+                                    if isinstance(candidate, dict)
+                                    else None
+                                )
+
+                                if isinstance(rf, dict):
+                                    raw_class = rf.get(
+                                        'raw_prediction', 'Unknown'
+                                    )
+
+                                    class_names = {
+                                        'Bearing': '베어링 결함 의심',
+                                        'Looseness': '풀림 결함 의심',
+                                        'Unbalance': '불균형 의심',
+                                        'Normal': 'RF 정상 예측',
+                                    }
+
+                                    st.warning(
+                                        f'RF 실험용 예측: {raw_class}'
+                                    )
+
+                                    st.write(
+                                        class_names.get(
+                                            raw_class, raw_class
+                                        )
+                                    )
+
+                                    st.caption(
+                                        '자동 후보 판정: 보류 · '
+                                        '확정 진단 아님'
+                                    )
+                                else:
+                                    st.info('RF 결함 후보: 보류')
+
+                                if isinstance(candidate, dict):
+                                    reasons = candidate.get(
+                                        'reasons', []
+                                    )
+
+                                    for reason in reasons:
+                                        st.caption(f'보류 사유: {reason}')
+                                else:
+                                    st.caption(
+                                        'RF 후보 분석 결과 없음'
+                                    )
                     else:
                         st.info('AE 판정 결과를 확인할 수 없습니다.')
+
+                    # RF_MAIN_EXPERIMENTAL_RESULT_V1
+                    rf_result = (
+                        candidate.get('engine')
+                        if isinstance(candidate, dict)
+                        else None
+                    )
+
+                    if isinstance(rf_result, dict):
+                        st.markdown('**RF 결함별 원시 분류 점수**')
+
+                        scores = rf_result.get(
+                            'scores_uncalibrated', {}
+                        )
+
+                        for label, score in sorted(
+                            scores.items(),
+                            key=lambda item: item[1],
+                            reverse=True,
+                        ):
+                            value = float(score)
+
+                            st.write(
+                                f'{label}: {value:.2%}'
+                            )
+
+                            st.progress(
+                                min(1.0, max(0.0, value))
+                            )
+
+                        margin = rf_result.get('score_margin')
+                        rule = rf_result.get('policy_rule')
+
+                        cols = st.columns(2)
+
+                        if margin is not None:
+                            cols[0].metric(
+                                '실제 분류 점수 차이',
+                                f'{float(margin):.6f}'
+                            )
+
+                        if isinstance(rule, dict):
+                            minimum = float(rule['margin_min'])
+
+                            cols[1].metric(
+                                '검증 기준',
+                                f'{minimum:.6f}'
+                            )
+
+                            if margin is not None:
+                                if float(margin) >= minimum:
+                                    st.caption(
+                                        '분류 점수 차이 기준 충족'
+                                    )
+                                else:
+                                    st.caption(
+                                        '분류 점수 차이 기준 미충족'
+                                    )
+                        else:
+                            cols[1].metric(
+                                '검증 기준', '미확립'
+                            )
+
+                        st.caption(
+                            'RF 원시 분류 점수는 미보정 출력이며 '
+                            '실제 결함 발생 확률이나 확정 진단이 아닙니다.'
+                        )
 
                     features = candidate.get('features') if isinstance(candidate, dict) else None
                     if isinstance(features, dict) and features:

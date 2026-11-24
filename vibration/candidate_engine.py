@@ -28,7 +28,16 @@ def sha256(path):
 
 
 def bundle_identity():
-    folder = os.environ.get('ISU_CHEMICAL_CANDIDATE_BUNDLE', '').strip()
+    default_folder = (
+        Path(__file__).resolve().parents[1]
+        / 'outputs'
+        / 'web_artifacts'
+        / 'rf_candidate'
+    )
+    folder = os.environ.get(
+        'ISU_CHEMICAL_CANDIDATE_BUNDLE',
+        str(default_folder)
+    ).strip()
     enabled = os.environ.get('ISU_CHEMICAL_CANDIDATE_LABELS', '0') == '1'
     if not folder:
         return None, enabled, None
@@ -151,8 +160,45 @@ class CandidateEngine:
             raise ValueError('후보 모델 패키지 버전이 현재 환경과 다릅니다.')
         if sha256(self.folder / 'model.joblib') != m['model_sha256']:
             raise ValueError('후보 모델 SHA256 불일치: 손상 또는 교체 여부를 확인하세요.')
-        if sha256(self.folder / 'split_files.csv') != m['split_files_sha256']:
-            raise ValueError('후보 모델 학습·평가 파일 목록 해시가 다릅니다.')
+        split_path = self.folder / 'split_files.csv'
+
+        if split_path.is_file():
+            if sha256(split_path) != m['split_files_sha256']:
+                raise ValueError(
+                    '후보 모델 학습·평가 파일 목록 해시가 다릅니다.'
+                )
+            self.provenance_mode = 'source_split_verified'
+        else:
+            verification_path = (
+                self.folder / 'deployment_verification.json'
+            )
+
+            verification = json.loads(
+                verification_path.read_text(encoding='utf-8')
+            )
+
+            expected = {
+                'schema_version': 1,
+                'purpose': 'web_inference_only',
+                'source_split_verified_at_export': True,
+                'source_split_sha256': m['split_files_sha256'],
+                'manifest_sha256': sha256(
+                    self.folder / 'manifest.json'
+                ),
+                'model_sha256': m['model_sha256'],
+                'training_report_sha256': sha256(
+                    self.folder / 'training_report.json'
+                ),
+                'raw_split_included': False,
+                'approved_for_production': False,
+            }
+
+            if verification != expected:
+                raise ValueError(
+                    'RF 웹 공유용 검증 기록이 일치하지 않습니다.'
+                )
+
+            self.provenance_mode = 'export_record_only'
         bounds = m['training_bounds']
         if any(len(bounds[k]) != len(FEATURES) for k in ('min', 'max')):
             raise ValueError('훈련 특징 범위가 호환되지 않습니다.')
