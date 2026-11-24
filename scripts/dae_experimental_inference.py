@@ -26,7 +26,7 @@ from vibration.dae_preprocessing import (
 class ExperimentalDAE:
     def __init__(self):
         with np.load(
-            OUT / "dae_train_validation.npz",
+            OUT / "dae_normalization.npz",
             allow_pickle=False
         ) as data:
             self.mean = data["mean"].copy()

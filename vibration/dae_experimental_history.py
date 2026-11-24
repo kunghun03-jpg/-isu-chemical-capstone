@@ -16,7 +16,7 @@ ARTIFACT_DIR = (
 
 ARTIFACTS = (
     "dae_group_split_best.pth",
-    "dae_train_validation.npz",
+    "dae_normalization.npz",
     "dae_thresholds.npz",
 )
 
