@@ -1,0 +1,236 @@
+{
+  "schema_version": 1,
+  "model_version": "candidate_rf_eda9_20261115T094210821974Z",
+  "feature_schema": "ch3_eda9_v1",
+  "trained_at_utc": "2026-11-15T09:42:10.822050+00:00",
+  "features": [
+    "rms_ac",
+    "peak_ac",
+    "crest_factor_ac",
+    "one_x_amplitude",
+    "two_x_amplitude",
+    "energy_low",
+    "energy_mid",
+    "energy_high",
+    "envelope_rms_ac"
+  ],
+  "feature_config": {
+    "channel": 3,
+    "fs": 25600,
+    "samples": 65536,
+    "order_tolerance_hz": 1.0,
+    "envelope_carrier_hz": [
+      2000.0,
+      8000.0
+    ],
+    "envelope_trim_seconds": 0.1,
+    "bands_hz": [
+      [
+        0,
+        200
+      ],
+      [
+        200,
+        2000
+      ],
+      [
+        2000,
+        10000
+      ]
+    ]
+  },
+  "classes": [
+    "Normal",
+    "Bearing",
+    "Looseness",
+    "Unbalance"
+  ],
+  "rf_config": {
+    "n_estimators": 200,
+    "max_depth": 5,
+    "min_samples_leaf": 2,
+    "class_weight": "balanced",
+    "random_state": 42,
+    "n_jobs": 1
+  },
+  "versions": {
+    "numpy": "2.4.6",
+    "scipy": "1.18.1",
+    "sklearn": "1.9.0",
+    "joblib": "1.6.0"
+  },
+  "model_sha256": "ca9462c840246e3dd3b020b5dd1768eb89db841fbac186efdab9949d9d22cceb",
+  "training_rpms": [
+    900,
+    1200,
+    1800
+  ],
+  "training_bounds": {
+    "min": [
+      0.056459558109946066,
+      0.26472662026712046,
+      3.847298313043513,
+      6.655817266401955e-05,
+      4.2910773488073275e-05,
+      0.0004081164900546892,
+      0.0019097044262092666,
+      0.00038046549604181014,
+      0.01371931487034939
+    ],
+    "max": [
+      2.3398382282140204,
+      17.283742514730182,
+      18.031348257214464,
+      0.14495472700180453,
+      0.08018474700261215,
+      0.018770717813487887,
+      2.4704125801555237,
+      3.9642889341861554,
+      1.5827594688035194
+    ]
+  },
+  "policy": {
+    "config": {
+      "min_validation_accepts": 5,
+      "target_validation_precision": 0.8,
+      "require_training_range": true,
+      "require_no_missing": true
+    },
+    "rules": {
+      "900:Bearing": {
+        "margin_min": 0.6839852943421721,
+        "validation_accepts": 56,
+        "validation_correct": 56,
+        "validation_precision": 1.0
+      },
+      "1200:Bearing": {
+        "margin_min": 0.6398861849905264,
+        "validation_accepts": 56,
+        "validation_correct": 56,
+        "validation_precision": 1.0
+      },
+      "1800:Bearing": {
+        "margin_min": 0.5426055936590337,
+        "validation_accepts": 60,
+        "validation_correct": 60,
+        "validation_precision": 1.0
+      }
+    },
+    "diagnostics": [
+      {
+        "rpm": 900,
+        "class": "Bearing",
+        "validation_truth_n": 82,
+        "eligible_predictions": 56,
+        "policy_available": true
+      },
+      {
+        "rpm": 900,
+        "class": "Unbalance",
+        "validation_truth_n": 50,
+        "eligible_predictions": 7,
+        "policy_available": false
+      },
+      {
+        "rpm": 900,
+        "class": "Looseness",
+        "validation_truth_n": 90,
+        "eligible_predictions": 99,
+        "policy_available": false
+      },
+      {
+        "rpm": 1200,
+        "class": "Bearing",
+        "validation_truth_n": 80,
+        "eligible_predictions": 56,
+        "policy_available": true
+      },
+      {
+        "rpm": 1200,
+        "class": "Unbalance",
+        "validation_truth_n": 52,
+        "eligible_predictions": 2,
+        "policy_available": false
+      },
+      {
+        "rpm": 1200,
+        "class": "Looseness",
+        "validation_truth_n": 90,
+        "eligible_predictions": 105,
+        "policy_available": false
+      },
+      {
+        "rpm": 1800,
+        "class": "Bearing",
+        "validation_truth_n": 90,
+        "eligible_predictions": 60,
+        "policy_available": true
+      },
+      {
+        "rpm": 1800,
+        "class": "Unbalance",
+        "validation_truth_n": 60,
+        "eligible_predictions": 49,
+        "policy_available": false
+      },
+      {
+        "rpm": 1800,
+        "class": "Looseness",
+        "validation_truth_n": 89,
+        "eligible_predictions": 36,
+        "policy_available": false
+      }
+    ],
+    "limitations": "Thresholds selected on validation; validation precision is optimistic, not a calibrated guarantee. Test is evaluated once without refitting."
+  },
+  "split_dates": {
+    "train": [
+      "20260912"
+    ],
+    "validation": [
+      "20260916"
+    ],
+    "test": [
+      "20260919"
+    ]
+  },
+  "source_eda_sha256": {
+    "/home/kungh/isu_rf_candidate_eda_run02/file_features.csv": "f699c88d8c44fbb2cb3602ab9ffc7ff13f98a3c101142a528810edca1c9d2215",
+    "/home/kungh/isu_rf_candidate_eda_run02/analysis.json": "105058b5383332dc92e24ec4411f019b87b05f5479894d7b0940891afbbfccaf"
+  },
+  "auto_labels_default": false,
+  "limitations": [
+    "독립성 미확인 예비 실험: small EDA sample; Run independence is unverified.",
+    "Dates/RPM may confound sensor, load, setup and measurement sequence; descriptive differences are not causal.",
+    "Prior test results informed this exploratory follow-up. Reused dates are not a fresh final test set.",
+    "No model adoption or web integration is authorized by these experiments alone.",
+    "Policy selection uses validation; apparent validation precision is optimistic.",
+    "This model was not refit on validation/test. Previous LODO scores are not this model performance.",
+    "Candidate evaluation uses all EDA files, not an AE-filtered subset; end-to-end gated performance is unverified."
+  ],
+  "split_files_sha256": "8808aa9383bd68b3696d645ab90878276c230eaabf98fea929f074ce58f2a408",
+  "split_counts": {
+    "train": 900,
+    "validation": 861,
+    "test": 617
+  },
+  "class_counts": {
+    "train": {
+      "Bearing": 270,
+      "Looseness": 270,
+      "Normal": 180,
+      "Unbalance": 180
+    },
+    "validation": {
+      "Bearing": 252,
+      "Looseness": 269,
+      "Normal": 178,
+      "Unbalance": 162
+    },
+    "test": {
+      "Bearing": 265,
+      "Normal": 178,
+      "Unbalance": 174
+    }
+  }
+}

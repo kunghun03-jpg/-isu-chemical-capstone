@@ -70,7 +70,21 @@ class SafeDAETests(unittest.TestCase):
         self.convert()
         ae={'models':{'autoencoder':{'file_score':1.,'file_threshold':.5,'predicted_anomaly':1}},'bundle_id':'synthetic'}
         before=deepcopy(ae)
-        row=references(self.raw,900,DashboardConfig('autoencoder',self.folder/'missing'),ae)[1]
-        self.assertEqual(row['status'],'지원 범위 미확인')
-        self.assertIsNone(row['score']);self.assertIsNone(row['threshold']);self.assertNotIn(row['decision'],('정상','이상'))
-        self.assertEqual(ae,before)
+        from unittest.mock import patch
+
+        with patch(
+            'vibration.dashboard_v3.predict_experimental_dae',
+            side_effect=ValueError('지원하지 않는 실험 RPM: 600')
+        ) as mocked:
+            row = references(
+                self.raw, 600,
+                DashboardConfig('autoencoder', self.folder/'missing'),
+                ae
+            )[1]
+
+        mocked.assert_called_once_with(self.raw, 600)
+        self.assertEqual(row['status'], '실행 오류')
+        self.assertIsNone(row['score'])
+        self.assertIsNone(row['threshold'])
+        self.assertNotIn(row['decision'], ('정상', '이상'))
+        self.assertEqual(ae, before)

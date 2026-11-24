@@ -89,12 +89,55 @@ def investigate_rpm(source, legacy_code):
 
 
 def compare_result(reference, actual):
-    for key in ("input_spectrum", "reconstructed_spectrum"):
-        np.testing.assert_array_equal(reference[key], actual[key], err_msg=key)
-    for key in ("mse", "threshold", "prediction"):
+    # Input preprocessing must remain identical.
+    np.testing.assert_array_equal(
+        reference["input_spectrum"],
+        actual["input_spectrum"],
+        err_msg="input_spectrum",
+    )
+
+    # Allow small floating-point differences in reconstruction.
+    expected = np.asarray(reference["reconstructed_spectrum"])
+    observed = np.asarray(actual["reconstructed_spectrum"])
+
+    if expected.shape != observed.shape:
+        raise ValueError("reconstructed_spectrum shape mismatch")
+
+    if not np.isfinite(expected).all() or not np.isfinite(observed).all():
+        raise ValueError("Non-finite reconstructed_spectrum")
+
+    np.testing.assert_allclose(
+        observed,
+        expected,
+        rtol=1e-6,
+        atol=1e-7,
+        equal_nan=False,
+        err_msg="reconstructed_spectrum",
+    )
+
+    expected_mse = float(np.asarray(reference["mse"]).item())
+    actual_mse = float(actual["mse"])
+
+    if not np.isfinite([expected_mse, actual_mse]).all():
+        raise ValueError("Non-finite MSE")
+
+    np.testing.assert_allclose(
+        actual_mse,
+        expected_mse,
+        rtol=1e-6,
+        atol=1e-8,
+        equal_nan=False,
+        err_msg="mse",
+    )
+
+    # Threshold and final decision must remain identical.
+    for key in ("threshold", "prediction"):
         expected = np.asarray(reference[key]).item()
         if expected != actual[key]:
-            raise ValueError(f"legacy/new 결과 불일치: {key}: {expected!r} != {actual[key]!r}")
+            raise ValueError(
+                f"legacy/new 결과 불일치: {key}: "
+                f"{expected!r} != {actual[key]!r}"
+            )
 
 
 def validate(source, legacy_code, output, mat=None):

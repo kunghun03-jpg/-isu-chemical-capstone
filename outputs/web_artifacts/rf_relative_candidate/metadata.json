@@ -1,0 +1,36 @@
+{
+  "model_type": "experimental_relative_feature_rf",
+  "classes": [
+    "Bearing",
+    "Looseness",
+    "Unbalance"
+  ],
+  "feature_columns": [
+    "crest_factor",
+    "peak_over_rms",
+    "one_x_over_rms",
+    "two_x_over_rms",
+    "low_energy_ratio",
+    "mid_energy_ratio",
+    "high_energy_ratio",
+    "envelope_over_rms"
+  ],
+  "train_files": 720,
+  "validation_files": 683,
+  "train_source": "/home/kungh/isu_rf_candidate_bundle_run01/split_files.csv",
+  "train_source_sha256": "8808aa9383bd68b3696d645ab90878276c230eaabf98fea929f074ce58f2a408",
+  "feature_source": "/home/kungh/isu_rf_candidate_eda_run02/file_features.csv",
+  "feature_source_sha256": "f699c88d8c44fbb2cb3602ab9ffc7ff13f98a3c101142a528810edca1c9d2215",
+  "training_labels": [
+    "Bearing",
+    "Looseness",
+    "Unbalance"
+  ],
+  "test_used": false,
+  "validated_for_operational_diagnosis": false,
+  "feature_transformation": {
+    "safe_rms": "max(abs(rms_ac), 1e-12)",
+    "energy_denominator": "safe_rms ** 2",
+    "description": "relative_features() in compare_rf_relative_features.py"
+  }
+}

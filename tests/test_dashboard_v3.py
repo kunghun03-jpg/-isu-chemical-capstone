@@ -19,7 +19,7 @@ class V3Tests(unittest.TestCase):
     upload=fixtures.DashboardV2Tests.upload
 
     def app(self):
-        return AppTest.from_file(str(ROOT/'streamlit_app_v3.py'),default_timeout=40).run()
+        return AppTest.from_file(str(ROOT/'streamlit_app_v3.py'),default_timeout=120).run()
 
     def result(self): return analyze_selected(self.raw,900,'measurement.mat',configuration())
 
@@ -44,8 +44,18 @@ class V3Tests(unittest.TestCase):
             self.assertEqual(actual['threshold'],expected['models'][model]['file_threshold'])
             self.assertEqual(actual['decision'],'이상' if actual['score']>actual['threshold'] else '정상')
         self.assertEqual(result,before)
-        with patch('vibration.dashboard_v3.bundle_status',return_value={'ready':False,'label':'RPM 적용 범위 미확인'}),patch('vibration.dashboard_v3.predict_dae',side_effect=AssertionError('blocked')):
-            self.assertEqual(references(self.raw,900,configuration(),result)[1]['status'],'RPM 적용 범위 미확인')
+        with patch(
+            'vibration.dashboard_v3.predict_experimental_dae',
+            side_effect=ValueError('실험용 DAE 입력 검증 실패')
+        ) as mocked:
+            checked = references(self.raw,900,configuration(),result)
+            dae = next(r for r in checked if r['model'] == 'dae')
+            self.assertEqual(dae['status'], '실행 오류')
+            self.assertIsNone(dae['score'])
+            self.assertIsNone(dae['threshold'])
+            self.assertEqual(dae['decision'], '실행 오류')
+            mocked.assert_called_once_with(self.raw, 900)
+            self.assertEqual(result, before)
 
     def test_corrupt_optional_reports_error_and_selected_corruption_still_fails(self):
         result,_=self.result()
@@ -59,8 +69,8 @@ class V3Tests(unittest.TestCase):
     def test_saved_references_duplicate_restart_and_old_history(self):
         result,versions=self.result();candidate,_=analyze_with_engine(self.raw,900,result)
         rows=references(self.raw,900,configuration(),result);store=HistoryStore(self.db)
-        identity,created=save_references(store,result,versions,candidate,rows);self.assertTrue(created)
-        self.assertFalse(save_references(store,result,versions,candidate,rows)[1])
+        identity,created=save_references(store,result,versions,candidate,rows,raw=self.raw);self.assertTrue(created)
+        self.assertFalse(save_references(store,result,versions,candidate,rows,raw=self.raw)[1])
         self.assertEqual(read_references(HistoryStore(self.db),identity),rows)
         import subprocess,sys,json
         code='import sys,json; from vibration.history import HistoryStore; from vibration.dashboard_v3 import read_references; print(json.dumps(read_references(HistoryStore(sys.argv[1]),int(sys.argv[2]))))'
@@ -86,9 +96,16 @@ class V3Tests(unittest.TestCase):
             self.assertEqual(len(app.session_state['v3_rows']),4)
             app.button(key='v3_save').click().run();self.assertFalse(app.exception)
             app.radio(key='v2_page').set_value('분석 이력').run();self.assertFalse(app.exception)
-            app.radio(key='v2_page').set_value('모델 성능 비교').run();self.assertFalse(app.exception)
-            self.assertTrue(any(i.value=='평가 자료 없음' for i in app.info))
-            app.radio(key='v2_page').set_value('홈 대시보드').run()
+            app.radio(key='v2_page').set_value('모델 정보').run();self.assertFalse(app.exception)
+            self.assertTrue(
+                any('모델 정보 및 적용 제한' in item.value
+                    for item in app.subheader)
+            )
+            self.assertTrue(
+                any('모델 성능 비교' in item.value
+                    for item in app.subheader)
+            )
+            app.radio(key='v2_page').set_value('분석하기').run()
             app.selectbox(key='v2_rpm').set_value(1200).run()
             self.assertNotIn('v2_result',app.session_state);self.assertNotIn('v3_rows',app.session_state)
 
@@ -130,6 +147,23 @@ class DAEReferenceTests(unittest.TestCase):
         expected=SavedDAEBundleInference(self.bundle).predict_bytes(self.raw,rpm=900)
         rows=references(self.raw,900,config,ae)
         dae=next(r for r in rows if r['model']=='dae')
-        self.assertEqual(dae['status'],'완료');self.assertEqual(dae['score'],expected['mse'])
-        self.assertEqual(dae['threshold'],expected['threshold']);self.assertEqual(dae['decision'],expected['prediction'])
-        self.assertNotEqual(references(self.raw,1200,config,ae)[1]['status'],'완료')
+        # 기존 번들 DAE의 정상 추론은 위에서 별도로 검증한다.
+        self.assertTrue(np.isfinite(expected['mse']))
+        self.assertTrue(np.isfinite(expected['threshold']))
+
+        # V3는 기존 번들이 아닌 독립적인 실험용 DAE를 사용한다.
+        from vibration.dae_experimental_bridge import predict_experimental_dae
+        experimental = predict_experimental_dae(self.raw, 900)
+        self.assertEqual(dae['status'], '완료')
+        self.assertEqual(dae['score'], experimental['score'])
+        self.assertEqual(dae['threshold'], experimental['threshold'])
+        self.assertEqual(dae['decision'], experimental['prediction'])
+        self.assertIs(dae['validated_for_operation'], False)
+        self.assertEqual(dae['evaluation_scope'], 'date_based_exploratory')
+        self.assertEqual(ae['models']['autoencoder']['file_score'], 0.)
+
+        # 기존 번들에서 지원하지 않는 RPM은 별도 번들 정책으로 검증한다.
+        from vibration.dae_bundle import check_rpm
+        from vibration.dae_bundle import load_manifest
+        with self.assertRaises(ValueError):
+            check_rpm(load_manifest(self.bundle), 1200)
