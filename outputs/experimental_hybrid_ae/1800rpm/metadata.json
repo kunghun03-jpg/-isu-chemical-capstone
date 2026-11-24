@@ -1,0 +1,24 @@
+{
+  "rpm": 1800,
+  "model": "hybrid_ae",
+  "weight_absolute": 0.5,
+  "weight_relative": 0.5,
+  "absolute_threshold": 0.2231152263110016,
+  "relative_threshold": 0.230615935560429,
+  "hybrid_threshold": 0.9960823843960331,
+  "threshold_method": "normal_validation_q95",
+  "validation_date": "20260912",
+  "validation_files": 30,
+  "experimental_only": true,
+  "approved_for_production": false,
+  "physical_run_independence_verified": false,
+  "artifact_sha256": {
+    "outputs/experimental_integrated_ae/1800rpm/model.pt": "f626717df6be971efc089505b8eb52d572461e0e25fee7ca0212e28efdd5d243",
+    "outputs/experimental_integrated_ae/1800rpm/normalization.npz": "b77f5e944e864635926dac0a0f112cb754e1cf0a81d9949ac7426f830a6c968d",
+    "outputs/experimental_integrated_ae/1800rpm/validation_scores.csv": "b5008a0788b1190fa55f922e3ed7ae1d1d1681db6e474e43e8b308fe05eca641",
+    "outputs/experimental_relative_ae/1800rpm/model.pt": "1ef552c2057cd72575071fc1f436469060453a3ce5c385b3bbd30fb1c42ba3dc",
+    "outputs/experimental_relative_ae/1800rpm/normalization.npz": "f57af0c60a0a8708ab45177dd429188bfa36ee392b8aaa7616cfa832b000c2a8",
+    "outputs/experimental_relative_ae/1800rpm/validation_scores.csv": "da22d1bd14cf070195826a8458ab39c9acfe79d860c97b1633b70bbe10597d66",
+    "outputs/experimental_integrated_ae/1800rpm/split.csv": "2a95bbb5cab9b4d0c7c3eff67d3da85d1940ed6efd4fc537d8997f1e38987ac1"
+  }
+}

@@ -7,11 +7,11 @@ from contextlib import closing
 import numpy as np
 import pandas as pd
 from vibration.inference import SavedModelInference
-from vibration.dae_ui import predict_dae
-from vibration.dae_readiness import probe as bundle_status
+from vibration.dae_experimental_bridge import predict_experimental_dae
+from vibration.dae_experimental_history import model_version
 from scripts.analyze_fault_signatures import peak_component
 
-MODELS={'autoencoder':'AE (기준)','dae':'DAE','ocsvm':'One-Class SVM','iforest':'Isolation Forest'}
+MODELS={'autoencoder':'AE (기준)','dae':'DAE (실험용)','ocsvm':'One-Class SVM','iforest':'Isolation Forest'}
 
 
 def analyze_selected(raw,rpm,filename,config,model='autoencoder'):
@@ -29,12 +29,18 @@ def references(raw,rpm,config,ae):
         row=dict(model=model,label=MODELS[model],status='모델 미연결',score=None,threshold=None,decision='미연결',rule='개별 저장 기준',version=None)
         try:
             if model=='dae':
-                state=bundle_status(rpm)
-                if not state['ready']:
-                    row.update(status='실행 오류' if state.get('code') in ('hash_error','manifest_error','model_load_error') or state['label']=='모델 검증 실패' else state['label'],reason=state.get('reason',state['label']))
-                    rows.append(row);continue
-                result=predict_dae(raw,rpm,state['id'])
-                row.update(score=result['mse'],threshold=result['threshold'],decision=result['prediction'],version=state['id'],rule='파일 전체 Welch 복원 MSE > 저장 임계값')
+                result = predict_experimental_dae(raw, rpm)
+                row.update(
+                    label='DAE (실험용)',
+                    score=result['score'],
+                    threshold=result['threshold'],
+                    decision=result['prediction'],
+                    version=model_version(),
+                    rule='Welch 복원 MSE > Normal Validation Q95',
+                    evaluation_scope='date_based_exploratory',
+                    validated_for_operation=False,
+                    reason='날짜 기준 탐색적 분석 · 운영 검증 미완료',
+                )
             else:
                 result,versions=analyze_selected(raw,rpm,'uploaded.mat',config,model)
                 item=result['models'][model]
@@ -58,10 +64,58 @@ def rotation_orders(details,rpm):
     return pd.DataFrame(values)
 
 
-def save_references(store,result,versions,candidate,rows):
-    identity,created=store.save(result,versions,candidate_report=candidate)
+def save_references(store,result,versions,candidate,rows,*,raw=None):
+    # V3 참고 결과의 직렬화 오류를 DB 저장 전에 확인
     payload=json.dumps(rows,ensure_ascii=False,sort_keys=True,allow_nan=False)
     checksum=hashlib.sha256(payload.encode()).hexdigest()
+
+    # DAE가 성공적으로 실행된 경우에만 실험용 이력 연결
+    dae_rows=[r for r in rows if r.get('model')=='dae']
+    if len(dae_rows)>1:
+        raise ValueError('DAE 결과가 중복되어 있습니다.')
+
+    dae_experimental=None
+    if dae_rows and dae_rows[0].get('status')=='완료':
+        row=dae_rows[0]
+        if type(raw) is not bytes or not raw:
+            raise ValueError('DAE 저장에 원본 MAT bytes가 필요합니다.')
+
+        rpm=int(result['input']['rpm'])
+        if hashlib.sha256(raw).hexdigest()!=result['input']['sha256']:
+            raise ValueError('업로드 파일과 분석 결과 SHA256이 다릅니다.')
+        if row.get('version')!=model_version():
+            raise ValueError('DAE 모델 버전이 분석 시점과 다릅니다.')
+        if row.get('validated_for_operation') is not False:
+            raise ValueError('DAE 실험용 검증 상태가 올바르지 않습니다.')
+
+        score=float(row['score'])
+        threshold=float(row['threshold'])
+        predicted=int(score>threshold)
+
+        if not np.isfinite([score,threshold]).all():
+            raise ValueError('DAE 점수 또는 임계값 오류')
+        if row['decision']!=('이상' if predicted else '정상'):
+            raise ValueError('DAE 점수와 판정이 일치하지 않습니다.')
+
+        dae_result={
+            'model':'DAE',
+            'rpm':rpm,
+            'score':score,
+            'threshold':threshold,
+            'predicted_anomaly':predicted,
+            'prediction':row['decision'],
+            'evaluation_scope':'date_based_exploratory',
+            'validated_for_operation':False,
+        }
+        dae_experimental=(raw,rpm,dae_result)
+
+    # AE·RF·DAE는 HistoryStore의 동일 트랜잭션에서 저장
+    identity,created=store.save(
+        result,
+        versions,
+        candidate_report=candidate,
+        dae_experimental=dae_experimental,
+    )
     with closing(sqlite3.connect(store.path)) as c,c:
         c.execute('PRAGMA foreign_keys=ON')
         c.execute('CREATE TABLE IF NOT EXISTS v3_reference_results (analysis_id INTEGER PRIMARY KEY REFERENCES analyses(id), payload_json TEXT NOT NULL, sha256 TEXT NOT NULL)')

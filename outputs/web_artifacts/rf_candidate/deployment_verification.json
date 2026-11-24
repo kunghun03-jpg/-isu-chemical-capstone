@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "purpose": "web_inference_only",
+  "source_split_verified_at_export": true,
+  "source_split_sha256": "8808aa9383bd68b3696d645ab90878276c230eaabf98fea929f074ce58f2a408",
+  "manifest_sha256": "78240a1aa125fc8303ec319e3668f8d2a46922df48f2229c1856cbbcd9f2a507",
+  "model_sha256": "ca9462c840246e3dd3b020b5dd1768eb89db841fbac186efdab9949d9d22cceb",
+  "training_report_sha256": "17e6228c19a4dffe0b76405ae1f5f4aec758ef4c3b00e506d4fed78437cb4e3d",
+  "raw_split_included": false,
+  "approved_for_production": false
+}

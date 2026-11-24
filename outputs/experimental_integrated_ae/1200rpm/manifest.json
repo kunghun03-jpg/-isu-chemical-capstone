@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "rpm": 1200,
+  "model": "integrated_autoencoder",
+  "status": "experimental_only",
+  "approved_for_production": false,
+  "training_conditions": [
+    "Normal1",
+    "Normal2"
+  ],
+  "training_date": "2026-09-12",
+  "threshold_source": "normal_validation_only",
+  "threshold_method": "file_score_q95",
+  "threshold": 0.2258864445107256,
+  "normalization_source": "normal_train_only",
+  "score_direction": "higher_is_more_anomalous",
+  "segment_aggregation": "mean",
+  "defect_recall_verified": false,
+  "run_independence_verified": false,
+  "artifacts_sha256": {
+    "model.pt": "3ce5d1509f2b87bc1cff8a10da43151a447b41e97b1a69ac492c117e7bf62684",
+    "normalization.npz": "78091cfc6c14a2283299c3cd15e49dfe263a942837329608040398aad100b067",
+    "validation_scores.csv": "5537c919a830ac852f543fa42683c90c2b57ab501b7628e0bc49044b2c1053e1",
+    "split.csv": "6f6cbdb225627504498220ee012911c2ffdc7de2b90a8ad7868d50ecd253328f"
+  }
+}

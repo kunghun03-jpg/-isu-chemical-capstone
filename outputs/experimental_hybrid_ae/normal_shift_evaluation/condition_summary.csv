@@ -1,0 +1,7 @@
+rpm,condition,files,integrated_fp,relative_fp,hybrid_fp,integrated_fpr,relative_fpr,hybrid_fpr
+900,Normal1,50,0,0,0,0.0,0.0,0.0
+900,Normal2,58,17,14,17,0.29310344827586204,0.2413793103448276,0.29310344827586204
+1200,Normal1,48,0,0,0,0.0,0.0,0.0
+1200,Normal2,46,0,0,0,0.0,0.0,0.0
+1800,Normal1,52,0,0,0,0.0,0.0,0.0
+1800,Normal2,51,51,51,51,1.0,1.0,1.0

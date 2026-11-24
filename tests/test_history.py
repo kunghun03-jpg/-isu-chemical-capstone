@@ -124,42 +124,44 @@ class HistoryTests(unittest.TestCase):
         self.assertEqual(first[0][0], restarted[0][0])
         self.assertEqual(restarted[1], 3)
 
-    def test_web_save_repeat_refresh_restart_and_error(self):
-        with patch.dict(os.environ, {"ISU_CHEMICAL_HISTORY_DB": str(self.path)}), patch(
-            "streamlit.file_uploader", return_value=upload(sample())
+    def test_history_save_repeat_restart_and_error(self):
+        # V3 웹 연결은 test_dashboard_v3.py에서 별도로 검증한다.
+        result = example()
+
+        with patch.dict(
+            os.environ,
+            {"ISU_CHEMICAL_HISTORY_DB": str(self.path)}
         ):
-            app = AppTest.from_file(
-                str(ROOT / "streamlit_app.py"), default_timeout=60
-            ).run()
-            app.button[0].click().run()
-            self.assertFalse(self.store.search())
-            app.button(key="save_analysis").click().run()
-            self.assertTrue(app.success)
-            app.button(key="save_analysis").click().run()
-            app.run()
-            self.assertFalse(app.exception)
+            first, created = self.store.save(result, VERSIONS)
+            self.assertTrue(created)
+
+            repeated, created = self.store.save(
+                deepcopy(result), VERSIONS
+            )
+            self.assertEqual(repeated, first)
+            self.assertFalse(created)
             self.assertEqual(len(self.store.search()), 3)
-            self.assertEqual(len(self.store.detail(1)["models"]), 3)
-            app.selectbox(key="history_model").select("OCSVM").run()
-            self.assertEqual(len(app.dataframe[1].value), 1)
-            self.assertEqual(len(app.dataframe[2].value), 3)
+
+            # 새로운 Store 인스턴스로 재접속해 저장 결과 확인
+            restarted = HistoryStore(self.path)
+            self.assertEqual(len(restarted.search()), 3)
+            self.assertEqual(
+                len(restarted.detail(first)["models"]), 3
+            )
+
+            # DB 오류 시 잘못된 성공 처리 또는 추가 저장 방지
             with patch(
                 "vibration.history.HistoryStore.save",
                 side_effect=sqlite3.OperationalError("disk full"),
             ):
-                app.button(key="save_analysis").click().run()
-                self.assertIn("저장에 실패", app.error[0].value)
-                self.assertFalse(app.exception)
-        # 새 브라우저/앱 세션에서도 업로드 없이 DB의 이력을 읽습니다.
-        with patch.dict(os.environ, {"ISU_CHEMICAL_HISTORY_DB": str(self.path)}), patch(
-            "streamlit.file_uploader", return_value=None
-        ):
-            restarted = AppTest.from_file(
-                str(ROOT / "streamlit_app.py"), default_timeout=60
-            ).run()
-            self.assertFalse(restarted.exception)
-            self.assertEqual(len(restarted.dataframe[0].value), 3)
-        st.cache_resource.clear()
+                with self.assertRaisesRegex(
+                    sqlite3.OperationalError, "disk full"
+                ):
+                    restarted.save(result, VERSIONS)
+
+            self.assertEqual(
+                len(HistoryStore(self.path).search()), 3
+            )
 
 
 if __name__ == "__main__":

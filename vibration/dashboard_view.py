@@ -17,13 +17,13 @@ CSS = '''<style>
 :root{--ink:#14243d;--muted:#465a76;--blue:#1769ff;--navy:#101f3c;--line:#dce4f2;--surface:#f3f6fc}
 .stApp{background:var(--surface);color:var(--ink);font-family:Inter,"Noto Sans KR",sans-serif}
 .block-container{max-width:1880px;padding:.25rem 1rem 1.1rem}
-[data-testid="stHeader"]{background:transparent;height:0;min-height:0;pointer-events:none!important}
+[data-testid="stHeader"]{background:transparent;height:3rem;min-height:3rem}
 [data-testid="stHeader"] button{pointer-events:auto}
-[data-testid="stToolbar"]{display:none}
+[data-testid="stToolbar"]{display:flex}
 [data-testid="stSidebar"]{background:linear-gradient(160deg,#142849 0%,#0b1930 100%);border-right:1px solid #254267}
 [data-testid="stSidebarUserContent"]{padding:18px 16px!important}
 [data-testid="stSidebarUserContent"]>div{padding:0!important}
-[data-testid="stSidebarHeader"]{height:0;min-height:0;padding:0}
+[data-testid="stSidebarHeader"]{height:2.5rem;min-height:2.5rem;padding:0}
 [data-testid="stSidebarCollapseButton"]{position:absolute;right:3px;top:2px;z-index:2}
 [data-testid="stSidebarCollapseButton"] span{color:#bfcee2}
 .st-key-v2_page{width:196px!important;margin-left:-20px}
@@ -167,13 +167,13 @@ def ae_card(result):
     st.caption('점수 > 임계값일 때 이상 · 고장 종류와 설비 안전을 확정하지 않습니다.')
 
 
-def candidate_card(report):
+def candidate_card(report, prefix='dashboard'):
     st.subheader('2. 결함 후보 분석')
     if report is None:
         st.markdown('<div class="candidate-banner neutral"><div class="overline">AE 분석 후 확인</div><strong>결과 대기</strong></div>', unsafe_allow_html=True)
         st.caption('AE 이상일 때만 후보 엔진을 실행합니다.')
         return
-    render_decision(report, prefix='dashboard', compact=True)
+    render_decision(report, prefix=prefix, compact=True)
     st.caption('모델 참고 예측은 오분류될 수 있습니다. 분류 점수는 신뢰도나 보정된 확률이 아닙니다.')
     if report.get('failure'):
         st.warning(report['failure'])

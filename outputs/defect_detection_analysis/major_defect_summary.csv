@@ -1,0 +1,10 @@
+defect_type,model,files,TP,FN,recall,fnr,evaluation_status
+Bearing,integrated_ae,442,442,0,1.0,0.0,exploratory_only
+Bearing,relative_ae,442,269,173,0.6085972850678733,0.3914027149321267,exploratory_only
+Bearing,hybrid_ae,442,442,0,1.0,0.0,exploratory_only
+Looseness,integrated_ae,452,452,0,1.0,0.0,exploratory_only
+Looseness,relative_ae,452,31,421,0.06858407079646017,0.9314159292035398,exploratory_only
+Looseness,hybrid_ae,452,452,0,1.0,0.0,exploratory_only
+Unbalance,integrated_ae,289,174,115,0.6020761245674741,0.39792387543252594,exploratory_only
+Unbalance,relative_ae,289,1,288,0.0034602076124567475,0.9965397923875432,exploratory_only
+Unbalance,hybrid_ae,289,97,192,0.3356401384083045,0.6643598615916955,exploratory_only

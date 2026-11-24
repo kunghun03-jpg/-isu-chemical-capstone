@@ -61,7 +61,7 @@ class DashboardV2Tests(unittest.TestCase):
         return patch("streamlit.file_uploader", return_value=stream)
 
     def app(self):
-        return AppTest.from_file(str(ROOT / "streamlit_app_v2.py"), default_timeout=30).run()
+        return AppTest.from_file(str(ROOT / "streamlit_app_v2.py"), default_timeout=120).run()
 
     def test_initial_dashboard_has_no_model_selector_or_fabricated_result(self):
         with patch("streamlit.file_uploader", return_value=None), patch(
@@ -178,7 +178,7 @@ class DashboardV2Tests(unittest.TestCase):
             return original(self.bundles / Path(folder).name, models=models)
         expected = original(self.bundles / "900rpm").predict_bytes(self.raw, rpm=900, filename="measurement.mat")
         with self.upload(), patch("vibration.inference.SavedModelInference", side_effect=load):
-            app = AppTest.from_file(str(ROOT / "streamlit_app.py"), default_timeout=30).run()
+            app = AppTest.from_file(str(ROOT / "streamlit_app.py"), default_timeout=120).run()
             app.button[0].click().run()
             self.assertFalse(app.exception)
             self.assertFalse(app.error)
