@@ -15,7 +15,13 @@ from vibration.web_inference import preview_mat,error_message,upload_name
 from vibration.candidate_analysis import analyze_with_engine
 from vibration.candidate_engine import bundle_identity
 from vibration.normal_comparison_ui import render_normal_comparison
-from vibration.ae_reconstruction_ui import reconstruction_data,render_reconstruction
+from vibration.ae_reconstruction_ui import render_reconstruction
+from vibration.reconstruction_cache import (
+    get_reconstruction_data, clear_reconstruction_cache,
+)
+from vibration.bandwise_reconstruction import analyze_reconstruction_data
+from vibration.bandwise_analysis_ui import render_bandwise_analysis
+
 from vibration.class_comparison_ui import render_class_comparison
 from vibration.v3_presentation import (CSS as RESPONSIVE_CSS, dae_diagnostics, hero,
     overview, model_tiles, signal_panel, advice_panel, guide_page)
@@ -38,6 +44,7 @@ def input_panel(config):
         identity=(hashlib.sha256(raw).hexdigest() if raw else None,upload_name(upload.name) if upload else None,rpm,config,stamps,bundle_identity(),bundle_status(rpm))
         if st.session_state.get('v3_input_identity')!=identity:
             v2.clear_result();st.session_state.pop('v3_rows',None)
+            clear_reconstruction_cache(st.session_state)
         st.session_state['v3_input_identity']=identity
         preview=None
         if raw:
@@ -46,6 +53,7 @@ def input_panel(config):
         run=st.button('▶ 분석 시작',key='v3_run',type='primary',width='stretch',disabled=preview is None or 'v2_result' in st.session_state)
         if run and 'v2_result' not in st.session_state:
             v2.clear_result();st.session_state.pop('v3_rows',None)
+            clear_reconstruction_cache(st.session_state)
             try:
                 with st.spinner('AE 및 RF 분석 중…'):
                     result,versions=analyze_selected(raw,rpm,upload_name(upload.name),config)
@@ -1490,8 +1498,22 @@ def main():
         if result is not None and preview is not None:
             try:
                 raw = st.session_state['v3_upload'].getvalue()
-                data = reconstruction_data(raw, rpm, config, result)
+                data = get_reconstruction_data(
+                    st.session_state, raw, rpm, config, result
+                )
                 render_reconstruction(data, result)
+
+                # Supplementary analysis reuses the existing AE reconstruction.
+                st.divider()
+                try:
+                    bandwise_analysis = analyze_reconstruction_data(
+                        data, result, rpm
+                    )
+                    render_bandwise_analysis(bandwise_analysis)
+                except Exception as bandwise_error:
+                    st.warning(
+                        '대역별 보조 분석 불가: ' + str(bandwise_error)
+                    )
             except Exception as error:
                 st.warning('AE 복원 시각화 불가: ' + str(error))
         else:
