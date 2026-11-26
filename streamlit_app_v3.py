@@ -1170,134 +1170,26 @@ def main():
                     Path(__file__).resolve().parent / 'outputs/web_artifacts/rf_relative_candidate'
                 )
 
-                _relative_meta = _relative_json.loads(
-                    (_relative_dir / 'metadata.json').read_text(
-                        encoding='utf-8'
-                    )
+                from vibration.rf_relative_inference import (
+                    predict_relative_rf,
                 )
 
-                _relative_expected_columns = [
-                    'crest_factor',
-                    'peak_over_rms',
-                    'one_x_over_rms',
-                    'two_x_over_rms',
-                    'low_energy_ratio',
-                    'mid_energy_ratio',
-                    'high_energy_ratio',
-                    'envelope_over_rms',
-                ]
-
-                if (
-                    _relative_meta.get('feature_columns')
-                    != _relative_expected_columns
-                ):
-                    raise ValueError('상대 특징 컬럼 순서 불일치')
-
-                if _relative_meta.get(
-                    'validated_for_operational_diagnosis'
-                ) is not False:
-                    raise ValueError('실험용 모델 정책 불일치')
-
-                _relative_source = Path(
-                    _relative_meta['feature_source']
-                )
-                _relative_split = Path(
-                    _relative_meta['train_source']
+                _relative_result = predict_relative_rf(
+                    report['features'],
+                    folder=_relative_dir,
                 )
 
-                if (
-                    _relative_hashlib.sha256(
-                        _relative_source.read_bytes()
-                    ).hexdigest()
-                    != _relative_meta['feature_source_sha256']
-                ):
-                    raise ValueError('학습 특징 원본 변경')
-
-                if (
-                    _relative_hashlib.sha256(
-                        _relative_split.read_bytes()
-                    ).hexdigest()
-                    != _relative_meta['train_source_sha256']
-                ):
-                    raise ValueError('학습 분할 원본 변경')
-
-                _relative_features = report['features']
-                _relative_rms = float(
-                    _relative_features['rms_ac']
+                _relative_prediction = (
+                    _relative_result['raw_prediction']
                 )
 
-                if (
-                    not _relative_np.isfinite(_relative_rms)
-                    or abs(_relative_rms) < 1e-12
-                ):
-                    raise ValueError('유효한 RMS가 없어 비교 불가')
-
-                _relative_safe_rms = max(
-                    abs(_relative_rms), 1e-12
+                _relative_scores = (
+                    _relative_result['scores_uncalibrated']
                 )
 
-                _relative_row = {
-                    'crest_factor': float(
-                        _relative_features['crest_factor_ac']
-                    ),
-                    'peak_over_rms': float(
-                        _relative_features['peak_ac']
-                    ) / _relative_safe_rms,
-                    'one_x_over_rms': float(
-                        _relative_features['one_x_amplitude']
-                    ) / _relative_safe_rms,
-                    'two_x_over_rms': float(
-                        _relative_features['two_x_amplitude']
-                    ) / _relative_safe_rms,
-                    'low_energy_ratio': float(
-                        _relative_features['energy_low']
-                    ) / (_relative_safe_rms ** 2),
-                    'mid_energy_ratio': float(
-                        _relative_features['energy_mid']
-                    ) / (_relative_safe_rms ** 2),
-                    'high_energy_ratio': float(
-                        _relative_features['energy_high']
-                    ) / (_relative_safe_rms ** 2),
-                    'envelope_over_rms': float(
-                        _relative_features['envelope_rms_ac']
-                    ) / _relative_safe_rms,
-                }
-
-                _relative_frame = pd.DataFrame(
-                    [_relative_row],
-                    columns=_relative_expected_columns,
+                _relative_provenance = (
+                    _relative_result['provenance_mode']
                 )
-
-                if not _relative_np.isfinite(
-                    _relative_frame.to_numpy(dtype=float)
-                ).all():
-                    raise ValueError('상대 특징에 비정상 숫자 포함')
-
-                _relative_model = _relative_joblib.load(
-                    _relative_dir / 'model.joblib'
-                )
-
-                _relative_prediction = str(
-                    _relative_model.predict(_relative_frame)[0]
-                )
-
-                _relative_probabilities = (
-                    _relative_model.predict_proba(
-                        _relative_frame
-                    )[0]
-                )
-
-                _relative_classes = (
-                    _relative_model.classes_
-                )
-
-                _relative_scores = {
-                    str(name): float(score)
-                    for name, score in zip(
-                        _relative_classes,
-                        _relative_probabilities,
-                    )
-                }
 
                 st.dataframe(
                     pd.DataFrame([
