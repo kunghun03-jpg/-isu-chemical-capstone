@@ -10,6 +10,10 @@ import streamlit as st
 from vibration.inference import SavedModelInference
 from vibration.dae_ui import bundle_status, preview_dae_mat, predict_dae, render_dae_result
 from vibration.history_ui import save_result, render_history
+from vibration.physical_ui import (
+    render_physical_analysis,
+    reset_physical_ui,
+)
 from vibration.detail_ui import render_details
 from vibration.web_inference import (
     MODEL_OPTIONS,
@@ -67,6 +71,7 @@ def main():
         st.session_state.pop("dae_result", None)
         st.session_state["input_identity"] = identity
     if raw is None:
+        reset_physical_ui()
         st.info(
             "signals=(6, 65536), fs=25600Hz인 MAT 파일을 업로드해 주세요. 최대 20MB입니다."
         )
@@ -76,6 +81,7 @@ def main():
     try:
         preview = preview_dae_mat(raw) if choice == "DAE" else preview_mat(raw)
     except Exception as error:
+        reset_physical_ui()
         st.error("입력 파일 확인: " + error_message(error))
         st.button("분석 실행", disabled=True)
         render_history()
@@ -151,6 +157,8 @@ def main():
         render_details(result, preview)
     if st.session_state.get("dae_result") is not None:
         render_dae_result(st.session_state["dae_result"])
+
+    render_physical_analysis(raw, rpm)
     st.caption(
         "원본 업로드 파일은 저장하지 않습니다. 결과 저장 버튼을 누른 분석 정보만 SQLite에 저장합니다. 결함 후보 추정은 후속 단계입니다."
     )

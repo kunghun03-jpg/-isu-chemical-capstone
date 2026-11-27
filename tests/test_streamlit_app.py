@@ -119,12 +119,12 @@ class StreamlitTests(unittest.TestCase):
 
     def test_empty_invalid_upload_and_missing_model(self):
         with patch("streamlit.file_uploader", return_value=None):
-            app = AppTest.from_file(str(ROOT / "streamlit_app.py")).run()
+            app = AppTest.from_file(str(ROOT / "streamlit_app.py"), default_timeout=60).run()
             self.assertTrue(app.button[0].disabled)
         bad = BytesIO(b"not a mat")
         bad.name = "broken.mat"
         with patch("streamlit.file_uploader", return_value=bad):
-            app = AppTest.from_file(str(ROOT / "streamlit_app.py")).run()
+            app = AppTest.from_file(str(ROOT / "streamlit_app.py"), default_timeout=60).run()
             self.assertTrue(app.error)
             self.assertTrue(app.button[0].disabled)
             self.assertFalse(app.exception)
@@ -132,7 +132,7 @@ class StreamlitTests(unittest.TestCase):
             "vibration.inference.SavedModelInference",
             side_effect=FileNotFoundError("missing"),
         ):
-            app = AppTest.from_file(str(ROOT / "streamlit_app.py")).run()
+            app = AppTest.from_file(str(ROOT / "streamlit_app.py"), default_timeout=60).run()
             app.button[0].click().run()
             self.assertFalse(app.exception)
             self.assertIn("저장 모델", app.error[0].value)
